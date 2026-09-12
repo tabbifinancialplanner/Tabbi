@@ -1,0 +1,5 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tabbi">
+  <rect width="128" height="128" rx="30" fill="#69445F"/>
+  <circle cx="98" cy="30" r="9" fill="#E6B88A"/>
+  <text x="64" y="92" font-family="Georgia, 'DM Serif Display', serif" font-size="70" fill="#F8F1F2" text-anchor="middle">T</text>
+</svg>

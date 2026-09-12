@@ -1,0 +1,3077 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJUYWJiaSI+CiAgPHJlY3Qgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiIHJ4PSIzMCIgZmlsbD0iIzY5NDQ1RiIvPgogIDxjaXJjbGUgY3g9Ijk4IiBjeT0iMzAiIHI9IjkiIGZpbGw9IiNFNkI4OEEiLz4KICA8dGV4dCB4PSI2NCIgeT0iOTIiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCAnRE0gU2VyaWYgRGlzcGxheScsIHNlcmlmIiBmb250LXNpemU9IjcwIiBmaWxsPSIjRjhGMUYyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UPC90ZXh0Pgo8L3N2Zz4K" />
+<meta name="theme-color" content="#69445F" />
+<title>Tabbi (browser preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet" />
+<style>/* ===========================================================
+   TABBI DESIGN TOKENS
+   Editorial, warm, gender-neutral, Kenya-first personal finance.
+=========================================================== */
+
+:root{
+  --bg: #F8F1F2;
+  --card: #FFFCFA;
+  --card-raised: #FFFFFF;
+  --ink: #2B211F;
+  --ink-soft: #56504E;
+  --ink-faint: #817674;
+  --rose: #C98291;
+  --plum: #69445F;
+  --sage: #82947B;
+  --apricot: #E6B88A;
+  --blush: #F1D9DE;
+  --warn: #A95C67;
+  --border: rgba(43,33,31,0.10);
+  --shadow: 0 1px 2px rgba(43,33,31,0.06), 0 8px 24px rgba(43,33,31,0.06);
+  --shadow-lift: 0 2px 4px rgba(43,33,31,0.08), 0 16px 40px rgba(43,33,31,0.10);
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --radius-pill: 999px;
+
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-hand: "Caveat", cursive;
+
+  --income: #82947B;
+  --expense: #A95C67;
+  --sidebar-w: 244px;
+}
+
+html[data-theme="dark"]{
+  --bg: #1C1614;
+  --card: #241D1B;
+  --card-raised: #2B221F;
+  --ink: #F3E9E4;
+  --ink-soft: #CDBFB9;
+  --ink-faint: #8E8079;
+  --rose: #D89AA6;
+  --plum: #B48CA8;
+  --sage: #9FB196;
+  --apricot: #E9C69B;
+  --blush: #3A2B2C;
+  --warn: #D08893;
+  --border: rgba(243,233,228,0.10);
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-lift: 0 2px 4px rgba(0,0,0,0.35), 0 16px 40px rgba(0,0,0,0.4);
+}
+
+*{ box-sizing: border-box; }
+html,body,#root{ height:100%; }
+body{
+  margin:0; background: var(--bg); color: var(--ink); font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased; transition: background .25s ease, color .25s ease;
+}
+h1,h2,h3,.font-display{ font-family: var(--font-display); font-weight:400; letter-spacing:-0.01em; }
+.font-hand{ font-family: var(--font-hand); }
+a{ color: inherit; }
+button{ font-family: inherit; }
+::selection{ background: var(--blush); color: var(--ink); }
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{
+  outline: 2px solid var(--plum); outline-offset: 2px; border-radius: var(--radius-s);
+}
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 8px; }
+.container{ max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 760px){ .container{ padding: 0 16px; } }
+.visually-hidden{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (prefers-reduced-motion: reduce){ *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+
+/* ===========================================================
+   TABBI COMPONENT STYLES
+=========================================================== */
+
+.tb-app{ display:flex; min-height:100vh; }
+.tb-sidebar{
+  width: var(--sidebar-w); flex-shrink:0; background: var(--card);
+  border-right: 1px solid var(--border); padding: 22px 14px;
+  display:flex; flex-direction:column; gap: 4px; position: sticky; top:0; height:100vh; overflow-y:auto;
+}
+.tb-brand{ font-family: var(--font-display); font-size: 26px; padding: 6px 12px 18px; color: var(--plum); }
+.tb-navitem{
+  display:flex; align-items:center; gap:10px; padding: 10px 12px; border-radius: var(--radius-m);
+  color: var(--ink-soft); text-decoration:none; cursor:pointer; font-size:14.5px; border:none; background:none; text-align:left; width:100%;
+}
+.tb-navitem:hover{ background: var(--blush); color: var(--ink); }
+.tb-navitem.active{ background: var(--plum); color: #fff; }
+.tb-navitem .em{ font-size:16px; width:20px; text-align:center; }
+.tb-sidebar-foot{ margin-top:auto; padding-top:12px; border-top:1px solid var(--border); }
+
+.tb-main{ flex:1; min-width:0; }
+.tb-topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding: 18px 28px; position:sticky; top:0; background: var(--bg); z-index: 5; border-bottom: 1px solid transparent;
+}
+.tb-page{ padding: 8px 28px 56px; }
+
+.tb-mobile-nav{ display:none; }
+.tb-menu-btn{ display:none; }
+
+@media (max-width: 900px){
+  .tb-sidebar{ display:none; }
+  .tb-menu-btn{ display:inline-flex; }
+  .tb-page{ padding: 8px 16px 90px; }
+  .tb-topbar{ padding: 14px 16px; }
+  .tb-mobile-nav{
+    display:flex; position:fixed; bottom:0; left:0; right:0; background:var(--card);
+    border-top:1px solid var(--border); z-index:20; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    overflow-x:auto; gap:2px;
+  }
+  .tb-mobile-nav .tb-navitem{ flex-direction:column; gap:2px; font-size:10.5px; padding:8px 10px; min-width:64px; }
+  .tb-mobile-drawer{ position:fixed; inset:0; z-index:30; background: rgba(0,0,0,.35); }
+  .tb-mobile-drawer-panel{ position:absolute; left:0; top:0; bottom:0; width:78%; max-width:300px; background:var(--card); padding:20px 14px; overflow-y:auto; }
+}
+
+.tb-card{ background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l); padding: 20px; box-shadow: var(--shadow); }
+.tb-grid{ display:grid; gap:16px; }
+.tb-grid-2{ grid-template-columns: 1fr 1fr; }
+.tb-grid-3{ grid-template-columns: repeat(3,1fr); }
+.tb-grid-4{ grid-template-columns: repeat(4,1fr); }
+@media (max-width: 900px){ .tb-grid-2,.tb-grid-3,.tb-grid-4{ grid-template-columns: 1fr; } }
+
+.tb-btn{ border-radius: var(--radius-pill); border: 1px solid transparent; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition: transform .12s ease, opacity .12s ease, background .15s ease; }
+.tb-btn:active{ transform: scale(0.98); }
+.tb-btn-md{ padding: 11px 20px; font-size: 14.5px; }
+.tb-btn-sm{ padding: 7px 14px; font-size: 13px; }
+.tb-btn-lg{ padding: 14px 26px; font-size: 16px; }
+.tb-btn-full{ width:100%; }
+.tb-btn-primary{ background: var(--plum); color: #fff; }
+.tb-btn-primary:hover{ opacity:.92; }
+.tb-btn-secondary{ background: var(--blush); color: var(--ink); }
+.tb-btn-ghost{ background: transparent; color: var(--ink-soft); border-color: var(--border); }
+.tb-btn-danger{ background: var(--warn); color: #fff; }
+.tb-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+.tb-iconbtn{ width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--card); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:var(--ink-soft); }
+.tb-iconbtn:hover{ background:var(--blush); color:var(--ink); }
+.tb-iconbtn.active{ background:var(--plum); color:#fff; border-color:var(--plum); }
+
+.tb-fab-add{ position:fixed; right:28px; bottom:28px; z-index:15; background: var(--plum); color:#fff; border:none; border-radius: var(--radius-pill); padding: 15px 22px; font-weight:700; font-size:15px; box-shadow: var(--shadow-lift); cursor:pointer; display:flex; align-items:center; gap:8px; }
+@media (max-width: 900px){ .tb-fab-add{ right:16px; bottom:78px; padding:13px 18px; } }
+
+.tb-progress-track{ width:100%; background: var(--border); border-radius: 99px; overflow:hidden; }
+.tb-progress-fill{ height:100%; border-radius:99px; transition: width .5s ease; }
+
+.tb-badge{ display:inline-block; padding: 3px 10px; border-radius: 99px; font-size:12px; font-weight:600; }
+.tb-badge-neutral{ background: var(--blush); color: var(--ink-soft); }
+.tb-badge-good{ background: rgba(130,148,123,0.2); color: var(--sage); }
+.tb-badge-warn{ background: rgba(169,92,103,0.15); color: var(--warn); }
+.tb-badge-info{ background: rgba(105,68,95,0.12); color: var(--plum); }
+
+.tb-empty{ text-align:center; padding: 44px 20px; color: var(--ink-soft); }
+.tb-empty-icon{ font-size:38px; margin-bottom:10px; }
+.tb-empty-title{ font-size:20px; color:var(--ink); margin-bottom:6px; }
+.tb-empty-body{ font-size:14px; max-width:360px; margin:0 auto 16px; }
+
+.tb-modal-backdrop{ position:fixed; inset:0; background: rgba(43,33,31,0.38); z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; }
+.tb-modal{ background: var(--card-raised); border-radius: var(--radius-l); padding: 22px; width:100%; max-height: 88vh; overflow-y:auto; box-shadow: var(--shadow-lift); }
+.tb-modal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+
+.tb-field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.tb-field-label{ font-size:13px; font-weight:600; color: var(--ink-soft); }
+.tb-field-hint{ font-size:12px; color: var(--ink-faint); }
+.tb-input{ border: 1px solid var(--border); border-radius: var(--radius-s); padding: 11px 13px; font-size:14.5px; background: var(--bg); color: var(--ink); font-family: inherit; width:100%; }
+.tb-input:focus{ border-color: var(--plum); }
+
+.tb-tabs{ display:flex; gap:4px; background: var(--blush); padding:4px; border-radius: var(--radius-pill); width:fit-content; }
+.tb-tab{ border:none; background:transparent; padding: 8px 16px; border-radius: 99px; cursor:pointer; font-size:13.5px; font-weight:600; color: var(--ink-soft); }
+.tb-tab.active{ background: var(--card-raised); color: var(--plum); box-shadow: var(--shadow); }
+
+.tb-toast-stack{ position:fixed; top:20px; right:20px; z-index:80; display:flex; flex-direction:column; gap:8px; }
+.tb-toast{ background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: var(--radius-m); font-size:14px; box-shadow: var(--shadow-lift); animation: tb-toast-in .2s ease; }
+@keyframes tb-toast-in{ from{ opacity:0; transform: translateY(-6px);} to{ opacity:1; transform:none; } }
+
+.tb-barchart{ display:flex; align-items:flex-end; gap:10px; }
+.tb-bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:6px; }
+.tb-bar{ width:100%; border-radius: 6px 6px 2px 2px; min-height:3px; transition: height .5s ease; }
+.tb-bar-label{ font-size:11px; color: var(--ink-faint); }
+
+.tb-tx-row{ display:flex; align-items:center; gap:12px; padding: 12px 4px; border-bottom: 1px solid var(--border); }
+.tb-tx-row:last-child{ border-bottom:none; }
+.tb-tx-icon{ width:38px; height:38px; border-radius:50%; background: var(--blush); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.tb-tx-main{ flex:1; min-width:0; }
+.tb-tx-title{ font-weight:600; font-size:14.5px; }
+.tb-tx-sub{ font-size:12.5px; color: var(--ink-faint); }
+.tb-tx-amount{ font-weight:700; font-size:15px; white-space:nowrap; }
+.tb-tx-amount.income{ color: var(--income); }
+.tb-tx-amount.expense{ color: var(--ink); }
+
+.tb-stat-label{ font-size:12.5px; color: var(--ink-faint); margin-bottom:4px; }
+.tb-stat-value{ font-size: 26px; font-family: var(--font-display); }
+
+.tb-chip{ display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:99px; border:1px solid var(--border); background:var(--card-raised); cursor:pointer; font-size:13.5px; font-weight:600; color:var(--ink-soft); }
+.tb-chip.active{ background: var(--plum); color:#fff; border-color: var(--plum); }
+
+.tb-month-switch{ display:flex; align-items:center; gap:10px; }
+.tb-month-switch button{ background:none; border:1px solid var(--border); border-radius:50%; width:32px; height:32px; cursor:pointer; color:var(--ink-soft); }
+
+.tb-badge-life{ font-size: 13px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js" crossorigin></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+"use strict";
+const { useState, useEffect } = React;
+
+/* ---- data/models.js ---- */
+/* ===========================================================
+   TABBI DATA MODELS
+   Shapes and constants only. See data/store.js for state.
+=========================================================== */
+
+const GROUPS = {
+  INCOME: "INCOME",
+  MUST_PAY: "MUST_PAY",
+  MY_WANTS: "MY_WANTS",
+  SAVINGS: "SAVINGS",
+  INVESTMENTS: "INVESTMENTS",
+};
+
+const GROUP_LABELS = {
+  INCOME: "Income",
+  MUST_PAY: "Must Pay",
+  MY_WANTS: "My Wants",
+  SAVINGS: "Savings",
+  INVESTMENTS: "Investments",
+};
+
+const TRANSACTION_TYPES = { INCOME: "income", EXPENSE: "expense" };
+
+const ACCOUNT_TYPES = ["M-Pesa", "Bank", "SACCO", "Cash", "Other"];
+
+const INCOME_SOURCE_TYPES = [
+  "Salary", "Freelance", "Business", "Side Hustle",
+  "Allowance", "Rental Income", "Commission", "Other",
+];
+
+const INVESTMENT_TYPES = [
+  "Money Market Fund", "Treasury Bills", "Treasury Bonds",
+  "SACCO", "Shares", "Pension", "Other",
+];
+
+const DEBT_TYPES = [
+  "Bank Loan", "Mobile Loan", "Credit Card", "SACCO Loan",
+  "HELB / Student Loan", "Personal Loan", "BNPL", "Other",
+];
+
+const INSURANCE_TYPES = [
+  "Life Insurance", "Medical / Health Insurance", "Motor Insurance — Private",
+  "Motor Insurance — Commercial", "Personal Accident", "Travel Insurance",
+  "Property / Home Insurance", "Fire Insurance", "Theft / Burglary Insurance",
+  "Agriculture / Crop Insurance", "Livestock Insurance", "Other",
+];
+
+const SINKING_FUND_TEMPLATES = [
+  "Rent", "Insurance", "Christmas", "School Fees", "Travel",
+  "Birthdays", "Car Maintenance", "Annual Subscriptions", "Medical Expenses",
+];
+
+const NOTE_CATEGORIES = [
+  "Money Thought", "Spending Reflection", "Goal Check-In",
+  "Money Lesson", "Money Gratitude",
+];
+
+const CURRENCIES = [
+  { code: "KES", symbol: "KSh", name: "Kenyan Shilling" },
+  { code: "USD", symbol: "$", name: "US Dollar" },
+  { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "EUR", symbol: "€", name: "Euro" },
+  { code: "CAD", symbol: "CA$", name: "Canadian Dollar" },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+  { code: "CHF", symbol: "CHF", name: "Swiss Franc" },
+  { code: "AED", symbol: "AED", name: "UAE Dirham" },
+  { code: "ZAR", symbol: "R", name: "South African Rand" },
+  { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
+  { code: "TZS", symbol: "TSh", name: "Tanzanian Shilling" },
+  { code: "UGX", symbol: "USh", name: "Ugandan Shilling" },
+];
+
+const SAVE_1M_CHALLENGE_ID = "save-1m";
+
+const CHALLENGE_DEFS = [
+  { id: SAVE_1M_CHALLENGE_ID, title: "Save Yourself First", icon: "💎", description: "The million milestone — one contribution at a time.", trackingType: "amount", targetAmount: 1000000, signature: true },
+  { id: "no-spend-7", title: "7-Day No-Spend Challenge", days: 7, icon: "🚫", description: "Go seven days without a single non-essential purchase." },
+  { id: "savings-30", title: "30-Day Savings Challenge", days: 30, icon: "💰", description: "Save something — anything — every day for a month." },
+  { id: "track-7", title: "Track Every Expense — 7 Days", days: 7, icon: "🧾", description: "Log every shilling you spend for a week straight." },
+  { id: "under-wants", title: "Stay Under Your My Wants Budget", days: 30, icon: "🛍️", description: "Finish the month at or under your My Wants planned amount." },
+  { id: "no-impulse", title: "No Impulse Shopping Week", days: 7, icon: "🧘", description: "Sit on any non-essential purchase for 48 hours." },
+  { id: "build-ef", title: "Build Your Emergency Fund", days: 30, icon: "🛟", description: "Make consistent contributions to your emergency fund." },
+  { id: "debt-sprint", title: "Debt Payoff Sprint", days: 30, icon: "🪙", description: "Put extra toward your debt every week this month." },
+  { id: "cook-home", title: "Cook At Home Challenge", days: 14, icon: "🍳", description: "Skip eating out for two weeks." },
+  { id: "invest-monthly", title: "Invest Every Month Challenge", days: 30, icon: "📈", description: "Make at least one investment contribution this month." },
+];
+
+const MONTH_STATUS = { ACTIVE: "ACTIVE", CLOSED: "CLOSED" };
+
+const DEFAULT_CATEGORIES = [
+  { group: GROUPS.MUST_PAY, name: "Rent / Mortgage" },
+  { group: GROUPS.MUST_PAY, name: "Electricity & Water" },
+  { group: GROUPS.MUST_PAY, name: "Internet & Airtime" },
+  { group: GROUPS.MUST_PAY, name: "Transport" },
+  { group: GROUPS.MUST_PAY, name: "Groceries" },
+  { group: GROUPS.MY_WANTS, name: "Eating Out" },
+  { group: GROUPS.MY_WANTS, name: "Shopping" },
+  { group: GROUPS.MY_WANTS, name: "Beauty" },
+  { group: GROUPS.MY_WANTS, name: "Entertainment" },
+  { group: GROUPS.SAVINGS, name: "Savings" },
+  { group: GROUPS.INVESTMENTS, name: "Investments" },
+];
+
+/* ---- data/store.js ---- */
+/* ===========================================================
+   TABBI STORE
+   A small, dependency-free data layer. localStorage today,
+   swappable for a backend later without touching UI code —
+   every screen talks to this module, never to localStorage.
+=========================================================== */
+
+const KEY = "tabbi:v1";
+
+function uid(prefix) {
+  return (prefix || "id") + "_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
+
+function monthId(year, month) { return year + "-" + String(month).padStart(2, "0"); }
+
+function defaultCategoriesForMonth() {
+  return DEFAULT_CATEGORIES.map(c => ({
+    id: uid("cat"), group: c.group, name: c.name, planned: 0, custom: false,
+  }));
+}
+
+function emptyState() {
+  const now = new Date();
+  const y = now.getFullYear(), mo = now.getMonth() + 1;
+  const id = monthId(y, mo);
+  return {
+    version: 1,
+    onboarded: false,
+    settings: {
+      currency: "KES",
+      displayName: "",
+      theme: "light",
+      personality: "Supportive",
+      roastLevel: "Playful",
+      pinEnabled: false,
+      pin: null,
+      notifications: {
+        upcomingBill: true, goalMilestone: true, challengeProgress: true,
+        budgetWarning: true, newMonth: true, recurringPayment: true, sinkingFundDeadline: true,
+      },
+    },
+    accounts: [],
+    incomeSources: [],
+    transactions: [],
+    months: {
+      [id]: {
+        id, year: y, month: mo, status: MONTH_STATUS.ACTIVE,
+        categories: defaultCategoriesForMonth(),
+        recurring: [],
+        createdDate: now.toISOString(), closedDate: null,
+        leftoverDecisions: {},
+      },
+    },
+    currentMonthId: id,
+    goals: { emergencyFund: null, sinkingFunds: [] },
+    insurancePolicies: [],
+    investments: [],
+    debts: [],
+    moneyNotes: [],
+    challenges: { joined: [], custom: [] },
+    netWorthSnapshots: [],
+  };
+}
+
+let state = load();
+const listeners = new Set();
+
+function load() {
+  try {
+    const raw = typeof localStorage !== "undefined" ? localStorage.getItem(KEY) : null;
+    if (!raw) return emptyState();
+    const parsed = JSON.parse(raw);
+    const base = emptyState();
+    const merged = Object.assign(base, parsed);
+    merged.settings = Object.assign({}, base.settings, parsed.settings || {});
+    merged.settings.notifications = Object.assign({}, base.settings.notifications, (parsed.settings && parsed.settings.notifications) || {});
+    merged.goals = Object.assign({}, base.goals, parsed.goals || {});
+    merged.challenges = Object.assign({}, base.challenges, parsed.challenges || {});
+    merged.challenges.joined = (parsed.challenges && parsed.challenges.joined) || [];
+    merged.challenges.custom = (parsed.challenges && parsed.challenges.custom) || [];
+    return merged;
+  } catch (e) {
+    console.error("Tabbi store load error", e);
+    return emptyState();
+  }
+}
+
+function persist() {
+  try { if (typeof localStorage !== "undefined") localStorage.setItem(KEY, JSON.stringify(state)); }
+  catch (e) { console.error("Tabbi persist error", e); }
+  listeners.forEach(fn => fn(state));
+}
+
+function subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); }
+function getState() { return state; }
+
+function set(mutator) {
+  const draft = JSON.parse(JSON.stringify(state));
+  mutator(draft);
+  state = draft;
+  persist();
+}
+
+// ---------- months ----------
+function ensureMonth(year, month) {
+  const id = monthId(year, month);
+  if (state.months[id]) return id;
+  set(d => {
+    const prev = d.months[d.currentMonthId];
+    d.months[id] = {
+      id, year, month, status: MONTH_STATUS.ACTIVE,
+      categories: prev ? prev.categories.map(c => ({ ...c, id: uid("cat") })) : defaultCategoriesForMonth(),
+      recurring: prev ? prev.recurring.slice() : [],
+      createdDate: new Date().toISOString(), closedDate: null,
+      leftoverDecisions: {},
+    };
+  });
+  return id;
+}
+
+function getMonth(id) { return state.months[id || state.currentMonthId]; }
+function getCurrentMonth() { return getMonth(state.currentMonthId); }
+function setCurrentMonth(id) { if (state.months[id]) set(d => { d.currentMonthId = id; }); }
+
+// ---------- accounts ----------
+function addAccount(acc) {
+  set(d => d.accounts.push({ id: uid("acc"), name: acc.name, type: acc.type, balance: Number(acc.balance) || 0, currency: acc.currency || d.settings.currency, institution: acc.institution || "", notes: acc.notes || "" }));
+}
+function updateAccount(id, patch) { set(d => { const a = d.accounts.find(x => x.id === id); if (a) Object.assign(a, patch); }); }
+function deleteAccount(id) { set(d => { d.accounts = d.accounts.filter(x => x.id !== id); }); }
+
+// ---------- income sources ----------
+function addIncomeSource(src) { set(d => d.incomeSources.push({ id: uid("inc"), name: src.name, type: src.type })); }
+function deleteIncomeSource(id) { set(d => { d.incomeSources = d.incomeSources.filter(x => x.id !== id); }); }
+
+// ---------- transactions (SOURCE OF TRUTH) ----------
+function addTransaction(tx) {
+  const id = uid("tx");
+  set(d => {
+    d.transactions.push({
+      id, type: tx.type, amount: Number(tx.amount) || 0, categoryId: tx.categoryId || null,
+      accountId: tx.accountId || null, date: tx.date || new Date().toISOString().slice(0, 10),
+      note: tx.note || "", recurring: tx.recurring || null,
+    });
+    if (tx.accountId) {
+      const acc = d.accounts.find(a => a.id === tx.accountId);
+      if (acc) acc.balance += (tx.type === "income" ? 1 : -1) * (Number(tx.amount) || 0);
+    }
+  });
+  return id;
+}
+function updateTransaction(id, patch) {
+  set(d => {
+    const tx = d.transactions.find(t => t.id === id);
+    if (!tx) return;
+    if (tx.accountId) {
+      const acc = d.accounts.find(a => a.id === tx.accountId);
+      if (acc) acc.balance -= (tx.type === "income" ? 1 : -1) * tx.amount;
+    }
+    Object.assign(tx, patch, { amount: Number(patch.amount != null ? patch.amount : tx.amount) });
+    if (tx.accountId) {
+      const acc = d.accounts.find(a => a.id === tx.accountId);
+      if (acc) acc.balance += (tx.type === "income" ? 1 : -1) * tx.amount;
+    }
+  });
+}
+function deleteTransaction(id) {
+  set(d => {
+    const tx = d.transactions.find(t => t.id === id);
+    if (!tx) return;
+    if (tx.accountId) {
+      const acc = d.accounts.find(a => a.id === tx.accountId);
+      if (acc) acc.balance -= (tx.type === "income" ? 1 : -1) * tx.amount;
+    }
+    d.transactions = d.transactions.filter(t => t.id !== id);
+  });
+}
+
+// ---------- budget categories ----------
+function addCategory(monthIdArg, group, name, planned) {
+  set(d => { d.months[monthIdArg].categories.push({ id: uid("cat"), group, name, planned: Number(planned) || 0, custom: true }); });
+}
+function updateCategory(monthIdArg, catId, patch) {
+  set(d => { const c = d.months[monthIdArg].categories.find(x => x.id === catId); if (c) Object.assign(c, patch); });
+}
+function deleteCategory(monthIdArg, catId) {
+  set(d => { d.months[monthIdArg].categories = d.months[monthIdArg].categories.filter(c => c.id !== catId); });
+}
+
+// ---------- months lifecycle ----------
+function closeMonth(id, options) {
+  set(d => {
+    const m = d.months[id];
+    m.status = MONTH_STATUS.CLOSED;
+    m.closedDate = new Date().toISOString();
+    if (options && options.leftoverDecisions) m.leftoverDecisions = options.leftoverDecisions;
+  });
+}
+
+function startNewMonth(year, month, carryOptions) {
+  const prevId = state.currentMonthId;
+  const newId = monthId(year, month);
+  set(d => {
+    const prev = d.months[prevId];
+    const carried = (!carryOptions || carryOptions.categories !== false)
+      ? prev.categories.map(c => ({ ...c, id: uid("cat") }))
+      : defaultCategoriesForMonth();
+    d.months[newId] = {
+      id: newId, year, month, status: MONTH_STATUS.ACTIVE,
+      categories: carried,
+      recurring: (carryOptions && carryOptions.recurringBills === false) ? [] : (prev.recurring || []).slice(),
+      createdDate: new Date().toISOString(), closedDate: null,
+      leftoverDecisions: {},
+    };
+    d.currentMonthId = newId;
+  });
+  return newId;
+}
+
+// ---------- goals ----------
+function setEmergencyFund(cfg) { set(d => { d.goals.emergencyFund = Object.assign({}, d.goals.emergencyFund, cfg); }); }
+function addSinkingFund(fund) {
+  set(d => d.goals.sinkingFunds.push({
+    id: uid("sink"), name: fund.name, targetAmount: Number(fund.targetAmount) || 0,
+    dueDate: fund.dueDate || null, savedAmount: Number(fund.savedAmount) || 0,
+    frequency: fund.frequency || "Monthly",
+  }));
+}
+function updateSinkingFund(id, patch) { set(d => { const f = d.goals.sinkingFunds.find(x => x.id === id); if (f) Object.assign(f, patch); }); }
+function deleteSinkingFund(id) { set(d => { d.goals.sinkingFunds = d.goals.sinkingFunds.filter(x => x.id !== id); }); }
+function contributeSinkingFund(id, amount) { set(d => { const f = d.goals.sinkingFunds.find(x => x.id === id); if (f) f.savedAmount += Number(amount) || 0; }); }
+function contributeEmergencyFund(amount) { set(d => { if (d.goals.emergencyFund) d.goals.emergencyFund.savedAmount = (d.goals.emergencyFund.savedAmount || 0) + (Number(amount) || 0); }); }
+
+// ---------- insurance ----------
+function addInsurancePolicy(p) {
+  set(d => d.insurancePolicies.push({
+    id: uid("ins"), type: p.type, provider: p.provider || "", premiumAmount: Number(p.premiumAmount) || 0,
+    frequency: p.frequency || "Monthly", nextDueDate: p.nextDueDate || null, savedAmount: Number(p.savedAmount) || 0,
+  }));
+}
+function updateInsurancePolicy(id, patch) { set(d => { const p = d.insurancePolicies.find(x => x.id === id); if (p) Object.assign(p, patch); }); }
+function deleteInsurancePolicy(id) { set(d => { d.insurancePolicies = d.insurancePolicies.filter(x => x.id !== id); }); }
+
+// ---------- investments ----------
+function addInvestment(inv) {
+  set(d => d.investments.push({ id: uid("iv"), name: inv.name, type: inv.type, balance: Number(inv.balance) || 0, institution: inv.institution || "", notes: inv.notes || "" }));
+}
+function updateInvestment(id, patch) { set(d => { const i = d.investments.find(x => x.id === id); if (i) Object.assign(i, patch); }); }
+function deleteInvestment(id) { set(d => { d.investments = d.investments.filter(x => x.id !== id); }); }
+
+// ---------- debts ----------
+function addDebt(debt) {
+  set(d => d.debts.push({
+    id: uid("debt"), name: debt.name, type: debt.type, balance: Number(debt.balance) || 0,
+    interestRate: Number(debt.interestRate) || 0, minPayment: Number(debt.minPayment) || 0,
+    dueDate: debt.dueDate || null, payments: [],
+  }));
+}
+function updateDebt(id, patch) { set(d => { const x = d.debts.find(v => v.id === id); if (x) Object.assign(x, patch); }); }
+function deleteDebt(id) { set(d => { d.debts = d.debts.filter(x => x.id !== id); }); }
+function recordDebtPayment(id, amount, date) {
+  set(d => {
+    const debt = d.debts.find(x => x.id === id);
+    if (!debt) return;
+    debt.payments.push({ id: uid("pay"), amount: Number(amount) || 0, date: date || new Date().toISOString().slice(0, 10) });
+    debt.balance = Math.max(0, debt.balance - (Number(amount) || 0));
+  });
+}
+
+// ---------- money notes ----------
+function addNote(note) {
+  set(d => d.moneyNotes.push({
+    id: uid("note"), category: note.category, text: note.text, date: new Date().toISOString(),
+    linkedType: note.linkedType || null, linkedId: note.linkedId || null,
+  }));
+}
+function deleteNote(id) { set(d => { d.moneyNotes = d.moneyNotes.filter(n => n.id !== id); }); }
+
+// ---------- challenges ----------
+function joinChallenge(challengeId) {
+  set(d => { if (!d.challenges.joined.find(c => c.challengeId === challengeId)) d.challenges.joined.push({ challengeId, startedAt: new Date().toISOString(), progress: 0, completedAt: null, monthlyTarget: 0 }); });
+}
+function updateChallengeProgress(challengeId, progress, target) {
+  set(d => {
+    const c = d.challenges.joined.find(x => x.challengeId === challengeId);
+    if (!c) return;
+    c.progress = progress;
+    if (target && progress >= target && !c.completedAt) c.completedAt = new Date().toISOString();
+  });
+}
+function contributeChallengeProgress(challengeId, amount, target) {
+  set(d => {
+    const c = d.challenges.joined.find(x => x.challengeId === challengeId);
+    if (!c) return;
+    c.progress = (c.progress || 0) + (Number(amount) || 0);
+    if (target && c.progress >= target && !c.completedAt) c.completedAt = new Date().toISOString();
+  });
+}
+function setChallengeMonthlyTarget(challengeId, amount) {
+  set(d => { const c = d.challenges.joined.find(x => x.challengeId === challengeId); if (c) c.monthlyTarget = Number(amount) || 0; });
+}
+function leaveChallenge(challengeId) { set(d => { d.challenges.joined = d.challenges.joined.filter(c => c.challengeId !== challengeId); }); }
+function addCustomChallenge(def) {
+  set(d => d.challenges.custom.push({
+    id: uid("chal"), custom: true, title: def.title, icon: def.icon || "🎯",
+    description: def.description || "Custom challenge", trackingType: def.trackingType || "days",
+    days: def.days || null, targetAmount: def.targetAmount || null, deadline: def.deadline || null,
+  }));
+}
+function deleteCustomChallenge(id) {
+  set(d => {
+    d.challenges.custom = d.challenges.custom.filter(c => c.id !== id);
+    d.challenges.joined = d.challenges.joined.filter(c => c.challengeId !== id);
+  });
+}
+
+// ---------- settings ----------
+function updateSettings(patch) { set(d => { Object.assign(d.settings, patch); }); }
+function updateNotificationSettings(patch) { set(d => { Object.assign(d.settings.notifications, patch); }); }
+function setOnboarded(v) { set(d => { d.onboarded = v; }); }
+
+// ---------- net worth ----------
+function snapshotNetWorth(nw) {
+  set(d => { d.netWorthSnapshots.push({ date: new Date().toISOString().slice(0, 10), ...nw }); });
+}
+
+// ---------- danger zone ----------
+function resetAllData() {
+  state = emptyState();
+  persist();
+}
+
+/* ---- utils/calculations.js ---- */
+/* ===========================================================
+   TABBI CALCULATIONS
+   Pure functions only — no side effects, no store access.
+   Every number on screen should be traceable to one of these.
+=========================================================== */
+
+const CURRENCY_SYMBOLS = CURRENCIES.reduce((acc, c) => { acc[c.code] = c.symbol; return acc; }, {});
+
+// Pure formatter — pass an explicit currency code (used for per-account
+// amounts, since accounts can each hold a different currency).
+function fmtMoney(n, currencyCode) {
+  const v = Math.round(Number(n) || 0);
+  const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode || "KSh";
+  return symbol + " " + v.toLocaleString("en-KE");
+}
+
+// Formats using the app's primary currency (Settings > Currency). Kept as
+// `fmtKES` so every existing call site across the app (Home, Budget, Goals,
+// Insurance, Debt, etc.) automatically shows the right symbol with zero
+// changes needed at each call site.
+function fmtKES(n) {
+  const state = getState();
+  return fmtMoney(n, (state && state.settings && state.settings.currency) || "KES");
+}
+
+function monthTxs(state, monthId) {
+  const m = state.months[monthId];
+  if (!m) return [];
+  const prefix = m.year + "-" + String(m.month).padStart(2, "0");
+  return state.transactions.filter(t => t.date && t.date.slice(0, 7) === prefix);
+}
+
+// ---------- Budget ----------
+function budgetSummary(state, monthId) {
+  const m = state.months[monthId];
+  if (!m) return null;
+  const txs = monthTxs(state, monthId);
+  const cats = m.categories.map(c => {
+    const spent = txs.filter(t => t.categoryId === c.id && t.type === "expense").reduce((s, t) => s + t.amount, 0);
+    return { ...c, spent, remaining: c.planned - spent, pct: c.planned > 0 ? Math.min(999, (spent / c.planned) * 100) : (spent > 0 ? 100 : 0) };
+  });
+  const income = txs.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const totalPlanned = cats.reduce((s, c) => s + c.planned, 0);
+  const totalSpent = cats.reduce((s, c) => s + c.spent, 0);
+  const byGroup = {};
+  Object.values(GROUPS).forEach(g => {
+    const gc = cats.filter(c => c.group === g);
+    byGroup[g] = { planned: gc.reduce((s, c) => s + c.planned, 0), spent: gc.reduce((s, c) => s + c.spent, 0), categories: gc };
+  });
+  return { categories: cats, byGroup, income, totalPlanned, totalSpent, remaining: income - totalSpent };
+}
+
+function incomeTotal(state, monthId) {
+  return monthTxs(state, monthId).filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+}
+function expenseTotal(state, monthId) {
+  return monthTxs(state, monthId).filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+}
+
+// ---------- Emergency Fund ----------
+function emergencyFundProgress(ef) {
+  if (!ef) return null;
+  const target = (ef.essentialMonthlyExpenses || 0) * (ef.targetMonths || 6);
+  const saved = ef.savedAmount || 0;
+  const remaining = Math.max(0, target - saved);
+  const pct = target > 0 ? Math.min(100, (saved / target) * 100) : 0;
+  const monthlyContribution = ef.monthlyContribution || 0;
+  const monthsToGo = monthlyContribution > 0 ? Math.ceil(remaining / monthlyContribution) : null;
+  let etaDate = null;
+  if (monthsToGo != null) { const d = new Date(); d.setMonth(d.getMonth() + monthsToGo); etaDate = d; }
+  return { target, saved, remaining, pct, monthlyContribution, monthsToGo, etaDate,
+    status: pct >= 100 ? "complete" : (monthlyContribution <= 0 ? "no-plan" : "on-track") };
+}
+
+// ---------- Sinking Funds ----------
+function sinkingFundProgress(fund) {
+  const remaining = Math.max(0, fund.targetAmount - fund.savedAmount);
+  const pct = fund.targetAmount > 0 ? Math.min(100, (fund.savedAmount / fund.targetAmount) * 100) : 0;
+  let periodsLeft = null, requiredContribution = null;
+  if (fund.dueDate) {
+    const daysLeft = Math.max(0, Math.ceil((new Date(fund.dueDate) - new Date()) / 86400000));
+    periodsLeft = fund.frequency === "Weekly" ? Math.max(1, Math.ceil(daysLeft / 7)) : Math.max(1, Math.ceil(daysLeft / 30.44));
+    requiredContribution = remaining / periodsLeft;
+  }
+  let status = "on-track";
+  if (pct >= 100) status = "complete";
+  else if (fund.dueDate && new Date(fund.dueDate) < new Date()) status = "behind";
+  return { remaining, pct, periodsLeft, requiredContribution, status };
+}
+
+// ---------- Insurance ----------
+function insuranceProgress(policy) {
+  const remaining = Math.max(0, policy.premiumAmount - policy.savedAmount);
+  const pct = policy.premiumAmount > 0 ? Math.min(100, (policy.savedAmount / policy.premiumAmount) * 100) : 0;
+  let daysUntilDue = null, requiredMonthly = null, status = "on-track";
+  if (policy.nextDueDate) {
+    daysUntilDue = Math.ceil((new Date(policy.nextDueDate) - new Date()) / 86400000);
+    const monthsLeft = Math.max(1 / 30, daysUntilDue / 30.44);
+    requiredMonthly = remaining / Math.max(1, Math.ceil(monthsLeft));
+    if (daysUntilDue < 0 && pct < 100) status = "behind";
+  }
+  if (pct >= 100) status = "complete";
+  return { remaining, pct, daysUntilDue, requiredMonthly, status };
+}
+
+// ---------- Debt Payoff Planner ----------
+function debtPayoffPlan(debts, extraMonthly, method) {
+  if (!debts || debts.length === 0) return { months: 0, milestones: [], totalInterest: 0 };
+  let working = debts.map(d => ({ id: d.id, name: d.name, balance: d.balance, rate: d.interestRate || 0, minPayment: d.minPayment || 0 })).filter(d => d.balance > 0);
+  const order = (method === "avalanche") ? working.slice().sort((a, b) => b.rate - a.rate) : working.slice().sort((a, b) => a.balance - b.balance);
+
+  let month = 0, totalInterest = 0;
+  const milestones = [];
+  const maxMonths = 600;
+  let extra = extraMonthly || 0;
+
+  while (order.some(d => d.balance > 0.5) && month < maxMonths) {
+    month++;
+    let freed = extra;
+    for (const d of order) {
+      if (d.balance <= 0) continue;
+      const interest = d.balance * (d.rate / 100 / 12);
+      totalInterest += interest;
+      d.balance += interest;
+      let pay = d.minPayment;
+      if (freed > 0) { pay += freed; freed = 0; }
+      pay = Math.min(pay, d.balance);
+      d.balance -= pay;
+      if (d.balance <= 0.5 && !d.paidOffMonth) { d.balance = 0; d.paidOffMonth = month; milestones.push({ id: d.id, name: d.name, month }); }
+    }
+    extra = extra + order.filter(d => d.balance <= 0 && d.paidOffMonth === month).reduce((s, d) => s + d.minPayment, 0);
+  }
+  return { months: month, milestones, totalInterest: Math.round(totalInterest) };
+}
+
+// ---------- Net Worth ----------
+function netWorth(state) {
+  const assets = state.accounts.reduce((s, a) => s + (a.balance || 0), 0) + state.investments.reduce((s, i) => s + (i.balance || 0), 0);
+  const liabilities = state.debts.reduce((s, d) => s + (d.balance || 0), 0);
+  return { assets, liabilities, netWorth: assets - liabilities };
+}
+
+// ---------- Annual ----------
+function annualSummary(state, year) {
+  const months = Object.values(state.months).filter(m => m.year === year).sort((a, b) => a.month - b.month);
+  const perMonth = months.map(m => {
+    const income = incomeTotal(state, m.id);
+    const expense = expenseTotal(state, m.id);
+    const b = budgetSummary(state, m.id);
+    const savings = b ? b.byGroup[GROUPS.SAVINGS].spent : 0;
+    const invested = b ? b.byGroup[GROUPS.INVESTMENTS].spent : 0;
+    return { month: m.month, income, expense, savings, invested };
+  });
+  const totals = perMonth.reduce((acc, m) => ({
+    income: acc.income + m.income, expense: acc.expense + m.expense,
+    savings: acc.savings + m.savings, invested: acc.invested + m.invested,
+  }), { income: 0, expense: 0, savings: 0, invested: 0 });
+  return { perMonth, totals };
+}
+
+function categoryBreakdownForYear(state, year) {
+  const months = Object.values(state.months).filter(m => m.year === year);
+  const totals = {};
+  months.forEach(m => {
+    const b = budgetSummary(state, m.id);
+    b.categories.forEach(c => { totals[c.name] = (totals[c.name] || 0) + c.spent; });
+  });
+  return Object.entries(totals).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+}
+
+// ---------- Insights ----------
+function generateInsights(state, monthId) {
+  const insights = [];
+  const b = budgetSummary(state, monthId);
+  if (!b) return insights;
+  const m = state.months[monthId];
+  const now = new Date();
+  const daysInMonth = new Date(m.year, m.month, 0).getDate();
+  const daysLeft = Math.max(0, daysInMonth - now.getDate());
+
+  b.categories.forEach(c => {
+    if (c.planned > 0 && c.pct >= 90 && c.pct < 100 && daysLeft > 3) {
+      insights.push({ type: "warning", text: `Your ${c.name} budget is ${Math.round(c.pct)}% used and there are still ${daysLeft} days left.` });
+    }
+    if (c.pct >= 100) {
+      insights.push({ type: "warning", text: `You've gone over budget on ${c.name} by ${fmtKES(c.spent - c.planned)}.` });
+    }
+  });
+
+  if (b.remaining > 0 && b.income > 0) {
+    insights.push({ type: "celebration", text: `You've got ${fmtKES(b.remaining)} left to plan for this month. Nice cushion.` });
+  }
+  if (b.totalSpent > 0 && b.totalPlanned > 0 && b.totalSpent < b.totalPlanned * 0.7 && daysLeft < 5) {
+    insights.push({ type: "celebration", text: `You stayed well under budget this month. We love to see it.` });
+  }
+
+  (state.goals.sinkingFunds || []).forEach(f => {
+    if (f.dueDate) {
+      const days = Math.ceil((new Date(f.dueDate) - now) / 86400000);
+      if (days >= 0 && days <= 14) insights.push({ type: "reminder", text: `${f.name} is due in ${days} day${days === 1 ? "" : "s"}.` });
+    }
+  });
+  (state.insurancePolicies || []).forEach(p => {
+    if (p.nextDueDate) {
+      const days = Math.ceil((new Date(p.nextDueDate) - now) / 86400000);
+      if (days >= 0 && days <= 14) insights.push({ type: "reminder", text: `${p.type} premium is due in ${days} day${days === 1 ? "" : "s"}.` });
+    }
+  });
+
+  return insights;
+}
+
+// ---------- Annual insights (only from real data) ----------
+function annualInsights(state, year) {
+  const { perMonth } = annualSummary(state, year);
+  const withData = perMonth.filter(m => m.income > 0 || m.expense > 0);
+  const insights = [];
+  if (withData.length >= 2) {
+    const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const bestSavings = withData.slice().sort((a, b) => b.savings - a.savings)[0];
+    if (bestSavings.savings > 0) insights.push(`You saved more in ${names[bestSavings.month - 1]} than any other month.`);
+    const last = withData[withData.length - 1], prev = withData[withData.length - 2];
+    if (last.expense > prev.expense * 1.15) insights.push(`Your spending increased in ${names[last.month - 1]}.`);
+    const firstRate = prev.income > 0 ? prev.savings / prev.income : 0;
+    const lastRate = last.income > 0 ? last.savings / last.income : 0;
+    if (lastRate > firstRate && firstRate > 0) insights.push(`Your savings rate improved by ${Math.round((lastRate - firstRate) * 100)}%.`);
+  }
+  return insights;
+}
+
+// ---------- Challenges (generic: day-streak or amount-based) ----------
+function challengeProgress(def, joinedRecord) {
+  const progress = joinedRecord ? (joinedRecord.progress || 0) : 0;
+  const completed = !!(joinedRecord && joinedRecord.completedAt);
+  if (def.trackingType === "amount") {
+    const target = def.targetAmount || 0;
+    const remaining = Math.max(0, target - progress);
+    const pct = target > 0 ? Math.min(100, (progress / target) * 100) : 0;
+    const monthlyTarget = (joinedRecord && joinedRecord.monthlyTarget) || 0;
+    const monthsToGo = monthlyTarget > 0 ? Math.ceil(remaining / monthlyTarget) : null;
+    return { type: "amount", target, saved: progress, remaining, pct, monthlyTarget, monthsToGo, completed };
+  }
+  const target = def.days || 0;
+  const pct = target > 0 ? Math.min(100, (progress / target) * 100) : 0;
+  return { type: "days", target, progress, pct, completed };
+}
+
+function challengeMilestones(target) {
+  return [0.1, 0.25, 0.5, 0.75, 1].map(f => ({ amount: Math.round((target || 0) * f), pct: Math.round(f * 100) }));
+}
+
+// ---------- Roast Me ----------
+function generateRoasts(state, monthId, level) {
+  const b = budgetSummary(state, monthId);
+  if (!b) return [];
+  const wants = b.byGroup[GROUPS.MY_WANTS];
+  const lines = { GENTLE: [], PLAYFUL: [], BRUTAL: [] };
+
+  if (wants && wants.planned > 0 && wants.spent > wants.planned) {
+    const over = wants.spent - wants.planned;
+    lines.GENTLE.push(`Okay bestie, My Wants went ${fmtKES(over)} over. We see you 😂`);
+    lines.PLAYFUL.push(`Your My Wants budget saw ${fmtKES(over)} in overspending and immediately resigned.`);
+    lines.BRUTAL.push(`At this point you're not budgeting. You're documenting the downfall of My Wants. 😭`);
+  }
+  const topCat = b.categories.slice().sort((a, c) => c.spent - a.spent)[0];
+  if (topCat && topCat.spent > 0) {
+    lines.GENTLE.push(`${topCat.name} was really out here taking most of your money this month.`);
+    lines.PLAYFUL.push(`${topCat.name}: ${fmtKES(topCat.spent)} spent. Bold choice, no notes.`);
+    lines.BRUTAL.push(`${fmtKES(topCat.spent)} on ${topCat.name}. Your future self would like a word.`);
+  }
+  if (b.income > 0 && b.totalSpent === 0) {
+    lines.GENTLE.push("No transactions logged yet — Tabbi has nothing to roast (yet).");
+    lines.PLAYFUL.push("You've added zero transactions. Even I need something to work with.");
+    lines.BRUTAL.push("Ghosting your own budget isn't a strategy.");
+  }
+  const key = (level || "PLAYFUL").toUpperCase();
+  return lines[key] && lines[key].length ? lines[key] : ["Add a few transactions and Tabbi will have plenty to say 👀"];
+}
+
+/* ---- utils/quickEntry.js ---- */
+
+const INCOME_WORDS = ["got paid", "salary", "earned", "received", "income", "paid me", "freelance payment", "commission", "sold", "got a refund", "refund"];
+
+const CATEGORY_KEYWORDS = {
+  "Eating Out": ["lunch", "dinner", "breakfast", "restaurant", "food delivery", "takeaway", "kfc", "java", "eating out", "ate out", "chips", "nyama"],
+  "Groceries": ["groceries", "supermarket", "naivas", "carrefour", "market"],
+  "Transport": ["uber", "bolt", "matatu", "fuel", "petrol", "fare", "transport", "taxi"],
+  "Shopping": ["shopping", "clothes", "shoes", "bought", "mall"],
+  "Beauty": ["salon", "barber", "nails", "makeup", "beauty", "haircut"],
+  "Entertainment": ["movie", "netflix", "cinema", "concert", "entertainment", "spotify"],
+  "Electricity & Water": ["kplc", "electricity", "water bill", "token"],
+  "Internet & Airtime": ["airtime", "data bundle", "wifi", "internet"],
+  "Rent / Mortgage": ["rent", "mortgage"],
+};
+
+const ACCOUNT_KEYWORDS = {
+  "M-Pesa": ["mpesa", "m-pesa"],
+  "Bank": ["bank", "card"],
+  "Cash": ["cash"],
+  "SACCO": ["sacco"],
+};
+
+function parseQuickEntry(text, state) {
+  const lower = text.toLowerCase();
+  const amountMatch = lower.match(/(?:ksh|kes|sh)?\s?(\d[\d,]*(?:\.\d+)?)\s?(?:ksh|kes|\/-|bob)?/i);
+  const amount = amountMatch ? Number(amountMatch[1].replace(/,/g, "")) : null;
+
+  const isIncome = INCOME_WORDS.some(w => lower.includes(w));
+  const type = isIncome ? "income" : "expense";
+
+  let categoryName = null;
+  for (const [cat, words] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (words.some(w => lower.includes(w))) { categoryName = cat; break; }
+  }
+  const month = getCurrentMonth();
+  let category = categoryName ? month.categories.find(c => c.name === categoryName) : null;
+  if (!category && !isIncome) category = month.categories.find(c => c.name === "Shopping") || month.categories[0];
+
+  let accountName = null;
+  for (const [acc, words] of Object.entries(ACCOUNT_KEYWORDS)) {
+    if (words.some(w => lower.includes(w))) { accountName = acc; break; }
+  }
+  let account = accountName ? state.accounts.find(a => a.type === accountName || a.name.toLowerCase().includes(accountName.toLowerCase())) : null;
+  if (!account && state.accounts.length) account = state.accounts[0];
+
+  return {
+    amount, type,
+    categoryId: category ? category.id : null,
+    accountId: account ? account.id : null,
+    date: new Date().toISOString().slice(0, 10),
+    note: text.trim(),
+    confidence: amount != null ? "ok" : "needs-amount",
+  };
+}
+
+/* ---- hooks/useStore.js ---- */
+
+function useTabbiState() {
+  const [state, setState] = useState(getState());
+  useEffect(() => subscribe(setState), []);
+  return state;
+}
+
+/* ---- components/ui/Primitives.jsx ---- */
+function Card({ children, className, style, onClick, as: As = "div" }) {
+  return (
+    <As onClick={onClick} className={"tb-card" + (className ? " " + className : "")} style={style}>
+      {children}
+    </As>
+  );
+}
+
+function Button({ children, variant = "primary", size = "md", onClick, type = "button", disabled, style, full }) {
+  return (
+    <button type={type} disabled={disabled} onClick={onClick} style={style}
+      className={`tb-btn tb-btn-${variant} tb-btn-${size}${full ? " tb-btn-full" : ""}`}>
+      {children}
+    </button>
+  );
+}
+
+function IconButton({ children, onClick, label, active }) {
+  return (
+    <button type="button" onClick={onClick} aria-label={label} title={label} className={"tb-iconbtn" + (active ? " active" : "")}>
+      {children}
+    </button>
+  );
+}
+
+function ProgressBar({ pct, color, height = 8, track }) {
+  const clamped = Math.max(0, Math.min(100, pct || 0));
+  return (
+    <div className="tb-progress-track" style={{ height, background: track }}>
+      <div className="tb-progress-fill" style={{ width: clamped + "%", background: color || "var(--plum)" }} />
+    </div>
+  );
+}
+
+function Badge({ children, tone = "neutral" }) {
+  return <span className={`tb-badge tb-badge-${tone}`}>{children}</span>;
+}
+
+function EmptyState({ title, body, action, icon }) {
+  return (
+    <div className="tb-empty">
+      <div className="tb-empty-icon" aria-hidden="true">{icon || "👀"}</div>
+      <div className="tb-empty-title font-display">{title}</div>
+      {body ? <div className="tb-empty-body">{body}</div> : null}
+      {action ? <div className="tb-empty-action">{action}</div> : null}
+    </div>
+  );
+}
+
+/* ---- components/ui/Overlays.jsx ---- */
+
+function Modal({ open, onClose, title, children, width }) {
+  if (!open) return null;
+  return (
+    <div className="tb-modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="tb-modal" style={{ maxWidth: width || 480 }} role="dialog" aria-modal="true" aria-label={title}>
+        <div className="tb-modal-head">
+          <h3 className="font-display" style={{ margin: 0 }}>{title}</h3>
+          <button className="tb-iconbtn" aria-label="Close" onClick={onClose}>✕</button>
+        </div>
+        <div className="tb-modal-body">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function ConfirmDialog({ open, onClose, onConfirm, title, body, confirmLabel = "Confirm", danger }) {
+  return (
+    <Modal open={open} onClose={onClose} title={title} width={400}>
+      <p style={{ color: "var(--ink-soft)", marginTop: 0 }}>{body}</p>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20 }}>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant={danger ? "danger" : "primary"} onClick={() => { onConfirm(); onClose(); }}>{confirmLabel}</Button>
+      </div>
+    </Modal>
+  );
+}
+
+function Field({ label, children, hint }) {
+  return (
+    <label className="tb-field">
+      <span className="tb-field-label">{label}</span>
+      {children}
+      {hint ? <span className="tb-field-hint">{hint}</span> : null}
+    </label>
+  );
+}
+
+function Input(props) { return <input {...props} className={"tb-input" + (props.className ? " " + props.className : "")} />; }
+function Select({ children, ...props }) { return <select {...props} className={"tb-input" + (props.className ? " " + props.className : "")}>{children}</select>; }
+function Textarea(props) { return <textarea {...props} className={"tb-input" + (props.className ? " " + props.className : "")} />; }
+
+function Tabs({ items, value, onChange }) {
+  return (
+    <div className="tb-tabs" role="tablist">
+      {items.map(it => (
+        <button key={it.value} role="tab" aria-selected={value === it.value}
+          className={"tb-tab" + (value === it.value ? " active" : "")} onClick={() => onChange(it.value)}>
+          {it.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ---- components/ui/Feedback.jsx ---- */
+
+let toastId = 0;
+
+function useToasts() {
+  const [toasts, setToasts] = useState([]);
+  function push(message, tone) {
+    const id = ++toastId;
+    setToasts(t => [...t, { id, message, tone: tone || "default" }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3200);
+  }
+  const node = (
+    <div className="tb-toast-stack" aria-live="polite">
+      {toasts.map(t => <div key={t.id} className={"tb-toast tb-toast-" + t.tone}>{t.message}</div>)}
+    </div>
+  );
+  return [push, node];
+}
+
+function Donut({ value, max, size = 120, stroke = 14, color }) {
+  const pct = max > 0 ? Math.max(0, Math.min(1, value / max)) : 0;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`${Math.round(pct * 100)} percent`}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color || "var(--plum)"} strokeWidth={stroke}
+        strokeDasharray={c} strokeDashoffset={c - pct * c} strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: "stroke-dashoffset .6s ease" }} />
+    </svg>
+  );
+}
+
+function BarChart({ data, valueKey = "value", labelKey = "label", color, height = 160 }) {
+  const max = Math.max(1, ...data.map(d => d[valueKey]));
+  return (
+    <div className="tb-barchart" style={{ height }} role="img" aria-label={data.map(d => `${d[labelKey]}: ${Math.round(d[valueKey])}`).join(", ")}>
+      {data.map((d, i) => (
+        <div className="tb-bar-col" key={i}>
+          <div className="tb-bar" style={{ height: (d[valueKey] / max * 100) + "%", background: d.color || color || "var(--plum)" }} title={`${d[labelKey]}: ${d[valueKey]}`} />
+          <div className="tb-bar-label">{d[labelKey]}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LineSpark({ points, width = 300, height = 80, color }) {
+  if (!points.length) return null;
+  const max = Math.max(...points, 1), min = Math.min(...points, 0);
+  const range = max - min || 1;
+  const step = width / Math.max(1, points.length - 1);
+  const d = points.map((p, i) => `${i === 0 ? "M" : "L"} ${i * step} ${height - ((p - min) / range) * height}`).join(" ");
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+      <path d={d} fill="none" stroke={color || "var(--plum)"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* ---- features/Shell/Shell.jsx ---- */
+
+const NAV = [
+  { key: "home", label: "Home", em: "🏠" },
+  { key: "budget", label: "Budget", em: "🧾" },
+  { key: "goals", label: "Goals", em: "🎯" },
+  { key: "money", label: "Money", em: "💸" },
+  { key: "investments", label: "Investments", em: "📈" },
+  { key: "debt", label: "Debt", em: "🪙" },
+  { key: "insurance", label: "Insurance", em: "🛡️" },
+  { key: "networth", label: "Net Worth", em: "🧮" },
+  { key: "insights", label: "Insights", em: "💡" },
+  { key: "challenges", label: "Challenges", em: "🏆" },
+  { key: "roastme", label: "Roast Me", em: "🔥" },
+  { key: "notes", label: "Money Notes", em: "📝" },
+  { key: "more", label: "More", em: "⋯" },
+];
+const MOBILE_PRIMARY = ["home", "budget", "money", "goals", "more"];
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function monthLabel(m) { return MONTH_NAMES[m.month - 1] + " " + m.year; }
+
+function MonthSwitcher({ state, onChange }) {
+  const m = getMonth(state.currentMonthId);
+  function shift(delta) {
+    let year = m.year, month = m.month + delta;
+    if (month < 1) { month = 12; year -= 1; }
+    if (month > 12) { month = 1; year += 1; }
+    const id = monthId(year, month);
+    if (state.months[id]) onChange(id);
+  }
+  const nextId = monthId(m.month === 12 ? m.year + 1 : m.year, m.month === 12 ? 1 : m.month + 1);
+  return (
+    <div className="tb-month-switch">
+      <button aria-label="Previous month" onClick={() => shift(-1)}>‹</button>
+      <strong style={{ fontSize: 14.5 }}>{monthLabel(m)}</strong>
+      <button aria-label="Next month" onClick={() => shift(1)} disabled={!state.months[nextId]}>›</button>
+    </div>
+  );
+}
+
+function Sidebar({ route, setRoute, state, setCurrentMonthId }) {
+  return (
+    <aside className="tb-sidebar" aria-label="Primary navigation">
+      <div className="tb-brand">Tabbi</div>
+      {NAV.map(n => (
+        <button key={n.key} className={"tb-navitem" + (route === n.key ? " active" : "")}
+          aria-current={route === n.key ? "page" : undefined} onClick={() => setRoute(n.key)}>
+          <span className="em" aria-hidden="true">{n.em}</span>{n.label}
+        </button>
+      ))}
+      <div className="tb-sidebar-foot">
+        <MonthSwitcher state={state} onChange={setCurrentMonthId} />
+      </div>
+    </aside>
+  );
+}
+
+function MobileDrawer({ open, onClose, route, setRoute }) {
+  if (!open) return null;
+  return (
+    <div className="tb-mobile-drawer" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="tb-mobile-drawer-panel">
+        <div className="tb-brand">Tabbi</div>
+        {NAV.map(n => (
+          <button key={n.key} className={"tb-navitem" + (route === n.key ? " active" : "")} onClick={() => { setRoute(n.key); onClose(); }}>
+            <span className="em" aria-hidden="true">{n.em}</span>{n.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MobileNav({ route, setRoute }) {
+  return (
+    <nav className="tb-mobile-nav" aria-label="Primary navigation">
+      {NAV.filter(n => MOBILE_PRIMARY.includes(n.key)).map(n => (
+        <button key={n.key} className={"tb-navitem" + (route === n.key ? " active" : "")} onClick={() => setRoute(n.key)}>
+          <span className="em" aria-hidden="true">{n.em}</span>{n.label}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function TopBar({ title, onMenu, onAddMoney, onToggleTheme, theme }) {
+  return (
+    <div className="tb-topbar">
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button className="tb-iconbtn tb-menu-btn" aria-label="Open menu" onClick={onMenu}>☰</button>
+        <h1 className="font-display" style={{ fontSize: 24, margin: 0 }}>{title}</h1>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <IconButton label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} onClick={onToggleTheme}>
+          {theme === "dark" ? "☀️" : "🌙"}
+        </IconButton>
+        <Button onClick={onAddMoney}>+ Add Money</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ---- features/Shell/AddMoneyModal.jsx ---- */
+
+function AddMoneyModal({ open, onClose, state, toast }) {
+  const [text, setText] = useState("");
+  const [parsed, setParsed] = useState(null);
+  const [step, setStep] = useState("chat");
+
+  useEffect(() => { if (open) { setText(""); setParsed(null); setStep("chat"); } }, [open]);
+
+  const month = getCurrentMonth();
+
+  function handleParse() {
+    if (!text.trim()) return;
+    setParsed(parseQuickEntry(text, state));
+    setStep("review");
+  }
+
+  function handleSave() {
+    if (!parsed || !parsed.amount) { toast("Add an amount before saving."); return; }
+    addTransaction(parsed);
+    toast(parsed.type === "income" ? "Income added 🎉" : "Got it — logged that expense.");
+    onClose();
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="What happened?" width={460}>
+      {step === "chat" && (
+        <div>
+          <p style={{ color: "var(--ink-soft)", marginTop: 0, fontSize: 14.5 }}>Tell me what happened with your money, in your own words.</p>
+          <Input autoFocus placeholder="e.g. I spent 850 on lunch" value={text}
+            onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleParse(); }} />
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "12px 0" }}>
+            {["I spent 500 on lunch", "Got paid 45000 salary", "Paid 1200 for uber"].map(ex => (
+              <button key={ex} className="tb-chip" onClick={() => setText(ex)}>{ex}</button>
+            ))}
+          </div>
+          <Button full onClick={handleParse} disabled={!text.trim()}>Continue</Button>
+        </div>
+      )}
+      {step === "review" && parsed && (
+        <div>
+          <p style={{ color: "var(--ink-soft)", marginTop: 0, fontSize: 13.5 }}>Here's what I picked up — edit anything before saving.</p>
+          <Field label="Type">
+            <Select value={parsed.type} onChange={e => setParsed({ ...parsed, type: e.target.value })}>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </Select>
+          </Field>
+          <Field label="Amount (KSh)">
+            <Input type="number" value={parsed.amount ?? ""} onChange={e => setParsed({ ...parsed, amount: Number(e.target.value) })} />
+          </Field>
+          {parsed.type === "expense" && (
+            <Field label="Category">
+              <Select value={parsed.categoryId || ""} onChange={e => setParsed({ ...parsed, categoryId: e.target.value })}>
+                <option value="">Uncategorized</option>
+                {month.categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </Select>
+            </Field>
+          )}
+          <Field label="Account">
+            <Select value={parsed.accountId || ""} onChange={e => setParsed({ ...parsed, accountId: e.target.value })}>
+              <option value="">No account</option>
+              {state.accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </Select>
+          </Field>
+          <Field label="Date">
+            <Input type="date" value={parsed.date} onChange={e => setParsed({ ...parsed, date: e.target.value })} />
+          </Field>
+          <Field label="Note">
+            <Input value={parsed.note} onChange={e => setParsed({ ...parsed, note: e.target.value })} />
+          </Field>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Button variant="ghost" onClick={() => setStep("chat")}>Back</Button>
+            <Button full onClick={handleSave}>Save</Button>
+          </div>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
+/* ---- features/Shell/StartNewMonthModal.jsx ---- */
+
+const CARRY_ITEMS = [
+  ["recurringIncome", "Recurring income"],
+  ["recurringBills", "Recurring bills"],
+  ["savingsGoals", "Savings goals"],
+  ["sinkingFunds", "Sinking funds"],
+  ["debtPayments", "Debt payments"],
+  ["insurancePremiums", "Insurance premiums"],
+  ["investmentPlans", "Investment plans"],
+  ["categories", "Budget categories"],
+];
+
+function Stat({ label, value }) {
+  return <div><div className="tb-stat-label">{label}</div><div className="tb-stat-value">{value}</div></div>;
+}
+
+function StartNewMonthModal({ open, onClose, state, toast, onDone }) {
+  const [step, setStep] = useState(1);
+  const [carry, setCarry] = useState({
+    recurringIncome: true, recurringBills: true, savingsGoals: true, sinkingFunds: true,
+    debtPayments: true, insurancePremiums: true, investmentPlans: true, categories: true,
+    carryUnspent: false, carryLeftover: false,
+  });
+
+  if (!open) return null;
+  const month = getMonth(state.currentMonthId);
+  const b = budgetSummary(state, month.id);
+  const income = incomeTotal(state, month.id);
+  const expense = expenseTotal(state, month.id);
+  const savings = b.byGroup[GROUPS.SAVINGS].spent;
+  const invested = b.byGroup[GROUPS.INVESTMENTS].spent;
+
+  function next() { setStep(s => Math.min(6, s + 1)); }
+  function back() { setStep(s => Math.max(1, s - 1)); }
+  function toggle(key) { setCarry(c => ({ ...c, [key]: !c[key] })); }
+
+  function confirm() {
+    let ny = month.year, nm = month.month + 1;
+    if (nm > 12) { nm = 1; ny += 1; }
+    closeMonth(month.id, {});
+    const newId = startNewMonth(ny, nm, carry);
+    toast(monthLabel(getMonth(newId)) + " is ready. Let's get your money together. 👏🏾");
+    onClose();
+    if (onDone) onDone();
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title={`${monthLabel(month)} is wrapped 🎉`} width={520}>
+      <ProgressBar pct={(step / 6) * 100} height={5} />
+      <div style={{ height: 16 }} />
+
+      {step === 1 && (
+        <div>
+          <h4 className="font-display" style={{ marginTop: 0 }}>Review {monthLabel(month)}</h4>
+          <div className="tb-grid tb-grid-2">
+            <Stat label="Income" value={fmtKES(income)} />
+            <Stat label="Spent" value={fmtKES(expense)} />
+            <Stat label="Saved" value={fmtKES(savings)} />
+            <Stat label="Invested" value={fmtKES(invested)} />
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div>
+          <h4 className="font-display" style={{ marginTop: 0 }}>Budget performance</h4>
+          {b.categories.filter(c => c.planned > 0).map(c => (
+            <div key={c.id} style={{ marginBottom: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, marginBottom: 4 }}>
+                <span>{c.name}</span><span>{fmtKES(c.spent)} / {fmtKES(c.planned)}</span>
+              </div>
+              <ProgressBar pct={c.pct} color={c.pct > 100 ? "var(--warn)" : "var(--sage)"} />
+            </div>
+          ))}
+          {b.categories.filter(c => c.planned > 0).length === 0 && <p style={{ color: "var(--ink-soft)" }}>No budget was planned this month.</p>}
+        </div>
+      )}
+
+      {step === 3 && (
+        <div>
+          <h4 className="font-display" style={{ marginTop: 0 }}>What should carry into next month?</h4>
+          {CARRY_ITEMS.map(([key, label]) => (
+            <label key={key} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 0" }}>
+              <input type="checkbox" checked={carry[key]} onChange={() => toggle(key)} />{label}
+            </label>
+          ))}
+          <div style={{ borderTop: "1px solid var(--border)", marginTop: 10, paddingTop: 10 }}>
+            <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "6px 0" }}>
+              <input type="checkbox" checked={carry.carryUnspent} onChange={() => toggle("carryUnspent")} />Carry forward unspent budget
+            </label>
+            <label style={{ display: "flex", gap: 10, alignItems: "center", padding: "6px 0" }}>
+              <input type="checkbox" checked={carry.carryLeftover} onChange={() => toggle("carryLeftover")} />Carry forward leftover money
+            </label>
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div>
+          <h4 className="font-display" style={{ marginTop: 0 }}>New month's budget</h4>
+          <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>Your budget categories will carry forward with the same planned amounts. You can adjust every category from the Budget screen once the new month opens.</p>
+        </div>
+      )}
+
+      {step === 5 && (
+        <div>
+          <h4 className="font-display" style={{ marginTop: 0 }}>Recurring payments</h4>
+          <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>
+            {carry.recurringBills ? "Recurring bills will carry forward automatically." : "Recurring bills will not carry forward — you'll add them fresh next month."}
+          </p>
+        </div>
+      )}
+
+      {step === 6 && (
+        <div>
+          <h4 className="font-display" style={{ marginTop: 0 }}>Ready for next month?</h4>
+          <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>{monthLabel(month)}'s data stays exactly as it is — nothing gets erased. Confirm to open the new month.</p>
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+        {step > 1 && <Button variant="ghost" onClick={back}>Back</Button>}
+        {step < 6 && <Button full onClick={next}>Continue</Button>}
+        {step === 6 && <Button full onClick={confirm}>Confirm & start new month</Button>}
+      </div>
+    </Modal>
+  );
+}
+
+/* ---- features/Shell/Onboarding.jsx ---- */
+
+function Onboarding({ onDone }) {
+  const [name, setName] = useState("");
+  const [currency, setCurrency] = useState("KES");
+
+  function start() {
+    updateSettings({ displayName: name.trim(), currency });
+    setOnboarded(true);
+    onDone();
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ maxWidth: 440, width: "100%", textAlign: "center" }}>
+        <div className="tb-brand" style={{ fontSize: 40, justifyContent: "center" }}>Tabbi</div>
+        <h1 className="font-display" style={{ fontSize: 28, margin: "8px 0 10px" }}>Let's get your money together 👏🏾</h1>
+        <p style={{ color: "var(--ink-soft)", fontSize: 15, marginBottom: 24 }}>
+          Plan where your money should go, track what actually happens, and build a healthier relationship with money.
+        </p>
+        <div style={{ textAlign: "left" }}>
+          <Field label="What should I call you?" hint="Your name or nickname — Tabbi will use it to greet you.">
+            <Input autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Waceke" onKeyDown={e => { if (e.key === "Enter" && name.trim()) start(); }} />
+          </Field>
+          <Field label="Primary currency" hint="You can change this later in Settings.">
+            <Select value={currency} onChange={e => setCurrency(e.target.value)}>
+              {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
+            </Select>
+          </Field>
+        </div>
+        <Button size="lg" full onClick={start} disabled={!name.trim()} style={{ marginTop: 8 }}>Get started</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ---- features/Shell/More.jsx ---- */
+
+const ITEMS = [
+  { key: "settings", label: "Settings", em: "⚙️", body: "Profile, currency, theme, personality, notifications, privacy." },
+  { key: "history", label: "Money History", em: "🗓️", body: "Every past month, preserved exactly as it happened." },
+  { key: "annual", label: "Annual View", em: "📊", body: "Your bigger financial picture for the year." },
+  { key: "help", label: "How Tabbi works", em: "❓", body: "Quick explanations for every part of the app." },
+];
+
+function More({ setRoute }) {
+  return (
+    <div>
+      <p style={{ color: "var(--ink-soft)", marginTop: -6 }}>Everything else, in one place.</p>
+      <div className="tb-grid tb-grid-2">
+        {ITEMS.map(it => (
+          <Card key={it.key} onClick={() => setRoute(it.key)} style={{ cursor: "pointer" }}>
+            <div style={{ fontSize: 24, marginBottom: 8 }}>{it.em}</div>
+            <h3 className="font-display" style={{ margin: "0 0 4px", fontSize: 18 }}>{it.label}</h3>
+            <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: 0 }}>{it.body}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---- features/Shell/Help.jsx ---- */
+
+const HELP_ITEMS = [
+  ["Home", "What is happening? Your financial command centre for the month."],
+  ["Budget", "Plan your money before the month starts."],
+  ["Money", "What actually happened — every transaction and account, in one place."],
+  ["Goals", "Tell Tabbi what you're saving for and we'll calculate what you need."],
+  ["Investments", "What am I growing? Track balances across your holdings."],
+  ["Debt", "What am I paying off? See a realistic path to zero."],
+  ["Insurance", "What am I protecting? Plan the savings behind every premium."],
+  ["Net Worth", "Your assets minus what you owe."],
+  ["Insights", "What is my money telling me?"],
+  ["Challenges", "Small money habits, made fun."],
+  ["Roast Me", "Call me out 😂 — based on your real spending."],
+  ["Money Notes", "What am I learning? A journal for your money thoughts."],
+  ["Start New Month", "Close the previous month safely and prepare the next one."],
+];
+
+function Help() {
+  return (
+    <div>
+      <p style={{ color: "var(--ink-soft)", marginTop: -6 }}>A quick guide to every part of Tabbi.</p>
+      <div className="tb-grid tb-grid-2">
+        {HELP_ITEMS.map(([title, body]) => (
+          <Card key={title}>
+            <h3 className="font-display" style={{ margin: "0 0 6px", fontSize: 17 }}>{title}</h3>
+            <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: 0 }}>{body}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---- features/Challenges/SaveOneMillion.jsx ---- */
+
+const DEF = CHALLENGE_DEFS.find(c => c.id === SAVE_1M_CHALLENGE_ID);
+
+function SaveOneMillionCard({ state, toast, compact }) {
+  const joined = state.challenges.joined.find(c => c.challengeId === SAVE_1M_CHALLENGE_ID);
+  const [contribOpen, setContribOpen] = useState(false);
+  const [amt, setAmt] = useState("");
+  const [targetOpen, setTargetOpen] = useState(false);
+  const [monthlyTarget, setMonthlyTarget] = useState((joined && joined.monthlyTarget) || "");
+
+  const target = DEF.targetAmount;
+  const saved = joined ? (joined.progress || 0) : 0;
+  const remaining = Math.max(0, target - saved);
+  const pct = target > 0 ? Math.min(100, (saved / target) * 100) : 0;
+  const milestones = challengeMilestones(target);
+  const completed = joined && joined.completedAt;
+
+  function join() { joinChallenge(SAVE_1M_CHALLENGE_ID); toast("Challenge joined — let's build that million 💎"); }
+  function contribute() {
+    contributeChallengeProgress(SAVE_1M_CHALLENGE_ID, Number(amt) || 0, target);
+    setContribOpen(false); setAmt("");
+    toast("Nice — added toward your million 💎");
+  }
+  function saveTarget() {
+    setChallengeMonthlyTarget(SAVE_1M_CHALLENGE_ID, Number(monthlyTarget) || 0);
+    setTargetOpen(false);
+    toast("Contribution target saved.");
+  }
+
+  return (
+    <Card style={{ marginBottom: compact ? 0 : 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+        <div>
+          <h3 className="font-display" style={{ margin: 0, fontSize: compact ? 17 : 20 }}>💎 Save Yourself First</h3>
+          <p style={{ color: "var(--ink-soft)", fontSize: 13, margin: "4px 0 0" }}>The {fmtKES(target)} milestone.</p>
+        </div>
+        {completed ? <Badge tone="good">Completed 🎉</Badge> : joined ? <Badge tone="info">In progress</Badge> : <Badge tone="neutral">Not joined</Badge>}
+      </div>
+
+      {!joined ? (
+        <Button size="sm" onClick={join}>Join the challenge</Button>
+      ) : (
+        <div>
+          {!compact && (
+            <div className="tb-grid tb-grid-3" style={{ marginBottom: 12 }}>
+              <div><div className="tb-stat-label">Target</div><div className="tb-stat-value" style={{ fontSize: 18 }}>{fmtKES(target)}</div></div>
+              <div><div className="tb-stat-label">Saved</div><div className="tb-stat-value" style={{ fontSize: 18 }}>{fmtKES(saved)}</div></div>
+              <div><div className="tb-stat-label">Remaining</div><div className="tb-stat-value" style={{ fontSize: 18 }}>{fmtKES(remaining)}</div></div>
+            </div>
+          )}
+          <ProgressBar pct={pct} color={completed ? "var(--sage)" : "var(--plum)"} height={compact ? 8 : 10} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "var(--ink-soft)", margin: "8px 0 12px" }}>
+            <span>{Math.round(pct)}% funded</span>
+            {joined.monthlyTarget ? <span>{fmtKES(joined.monthlyTarget)}/mo target</span> : null}
+          </div>
+          {!compact && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+              {milestones.map(m => (
+                <span key={m.pct} className={"tb-chip" + (saved >= m.amount ? " active" : "")}>{m.pct}% · {fmtKES(m.amount)}</span>
+              ))}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Button size="sm" onClick={() => setContribOpen(true)}>+ Add contribution</Button>
+            {!compact && <Button size="sm" variant="ghost" onClick={() => setTargetOpen(true)}>Set contribution target</Button>}
+          </div>
+        </div>
+      )}
+
+      <Modal open={contribOpen} onClose={() => setContribOpen(false)} title="Add contribution" width={360}>
+        <Field label={`Amount (${state.settings.currency})`}><Input type="number" value={amt} onChange={e => setAmt(e.target.value)} /></Field>
+        <Button full onClick={contribute}>Add</Button>
+      </Modal>
+
+      <Modal open={targetOpen} onClose={() => setTargetOpen(false)} title="Monthly contribution target" width={360}>
+        <Field label={`Amount (${state.settings.currency})`} hint="Tabbi uses this to estimate months remaining."><Input type="number" value={monthlyTarget} onChange={e => setMonthlyTarget(e.target.value)} /></Field>
+        <Button full onClick={saveTarget}>Save target</Button>
+      </Modal>
+    </Card>
+  );
+}
+
+/* ---- features/Home/Home.jsx ---- */
+
+function Home({ state, setRoute, toast, onAddMoney, onStartNewMonth }) {
+  const month = getMonth(state.currentMonthId);
+  const b = budgetSummary(state, month.id);
+  const income = b.income, spent = b.totalSpent, remaining = income - spent;
+  const nw = netWorth(state);
+  const insights = generateInsights(state, month.id);
+  const recentTxs = monthTxs(state, month.id).slice().sort((a, c) => c.date.localeCompare(a.date)).slice(0, 5);
+
+  const today = new Date();
+  const isLastDay = today.getDate() === new Date(month.year, month.month, 0).getDate();
+  const hasAnyData = state.accounts.length || state.transactions.length;
+
+  function greeting() {
+    const h = today.getHours();
+    const base = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+    const name = state.settings.displayName && state.settings.displayName.trim();
+    return name ? `${base}, ${name}` : base;
+  }
+
+  return (
+    <div>
+      <p style={{ color: "var(--ink-soft)", marginTop: -6 }}>{greeting()} 👋🏾 Here's {monthLabel(month)} so far.</p>
+
+      {!hasAnyData && (
+        <Card style={{ marginBottom: 20 }}>
+          <EmptyState icon="👀" title="No money moves yet" body="Add your first transaction and let's see where your money goes."
+            action={<Button onClick={onAddMoney}>+ Add Money</Button>} />
+        </Card>
+      )}
+
+      <div className="tb-grid tb-grid-3" style={{ marginBottom: 20 }}>
+        <Card><div className="tb-stat-label">Income this month</div><div className="tb-stat-value">{fmtKES(income)}</div></Card>
+        <Card><div className="tb-stat-label">Spent so far</div><div className="tb-stat-value">{fmtKES(spent)}</div></Card>
+        <Card><div className="tb-stat-label">Money remaining</div><div className="tb-stat-value" style={{ color: remaining < 0 ? "var(--warn)" : "var(--ink)" }}>{fmtKES(remaining)}</div></Card>
+      </div>
+
+      <div className="tb-grid tb-grid-2" style={{ alignItems: "start" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <Card>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h3 className="font-display" style={{ margin: 0, fontSize: 19 }}>Budget progress</h3>
+              <a onClick={() => setRoute("budget")} style={{ cursor: "pointer", color: "var(--plum)", fontSize: 13.5, fontWeight: 600 }}>View budget →</a>
+            </div>
+            {b.categories.filter(c => c.planned > 0).length === 0 ? (
+              <EmptyState icon="🧾" title="No budget planned yet" body="Set planned amounts for your categories to track progress here." />
+            ) : b.categories.filter(c => c.planned > 0).slice(0, 4).map(c => (
+              <div key={c.id} style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, marginBottom: 4 }}>
+                  <span>{c.name}</span><span>{fmtKES(c.spent)} / {fmtKES(c.planned)}</span>
+                </div>
+                <ProgressBar pct={c.pct} color={c.pct >= 100 ? "var(--warn)" : "var(--sage)"} />
+              </div>
+            ))}
+          </Card>
+
+          <Card>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h3 className="font-display" style={{ margin: 0, fontSize: 19 }}>Recent transactions</h3>
+              <a onClick={() => setRoute("money")} style={{ cursor: "pointer", color: "var(--plum)", fontSize: 13.5, fontWeight: 600 }}>See all →</a>
+            </div>
+            {recentTxs.length === 0 ? (
+              <EmptyState icon="💸" title="Nothing logged yet" body="Your transactions will show up here." />
+            ) : recentTxs.map(t => {
+              const cat = month.categories.find(c => c.id === t.categoryId);
+              return (
+                <div className="tb-tx-row" key={t.id}>
+                  <div className="tb-tx-icon">{t.type === "income" ? "💰" : "🧾"}</div>
+                  <div className="tb-tx-main">
+                    <div className="tb-tx-title">{cat ? cat.name : (t.type === "income" ? "Income" : "Expense")}</div>
+                    <div className="tb-tx-sub">{t.note || t.date}</div>
+                  </div>
+                  <div className={"tb-tx-amount " + t.type}>{t.type === "income" ? "+" : "-"}{fmtKES(t.amount)}</div>
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <Card>
+            <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 19 }}>Net worth</h3>
+            <div className="tb-stat-value" style={{ marginBottom: 6 }}>{fmtKES(nw.netWorth)}</div>
+            <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>Assets {fmtKES(nw.assets)} · Liabilities {fmtKES(nw.liabilities)}</div>
+            <a onClick={() => setRoute("networth")} style={{ cursor: "pointer", color: "var(--plum)", fontSize: 13.5, fontWeight: 600, display: "inline-block", marginTop: 10 }}>See details →</a>
+          </Card>
+
+          <Card>
+            <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 19 }}>Insights</h3>
+            {insights.length === 0 ? (
+              <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>Nothing to flag right now — you're on track.</p>
+            ) : insights.slice(0, 3).map((ins, i) => (
+              <div key={i} style={{ marginBottom: 10, fontSize: 14 }}>
+                <Badge tone={ins.type === "warning" ? "warn" : ins.type === "celebration" ? "good" : "info"}>{ins.type}</Badge>
+                <div style={{ marginTop: 6 }}>{ins.text}</div>
+              </div>
+            ))}
+            <a onClick={() => setRoute("insights")} style={{ cursor: "pointer", color: "var(--plum)", fontSize: 13.5, fontWeight: 600 }}>All insights →</a>
+          </Card>
+
+          <Card>
+            <SaveOneMillionCard state={state} toast={toast} compact />
+            <a onClick={() => setRoute("goals")} style={{ cursor: "pointer", color: "var(--plum)", fontSize: 13.5, fontWeight: 600, display: "inline-block", marginTop: 10 }}>Manage goal →</a>
+          </Card>
+
+          {isLastDay && (
+            <Card style={{ background: "var(--blush)" }}>
+              <h3 className="font-display" style={{ margin: "0 0 8px", fontSize: 18 }}>{monthLabel(month)} is wrapping up</h3>
+              <p style={{ fontSize: 14, color: "var(--ink-soft)" }}>Ready to close it out and start next month?</p>
+              <Button onClick={onStartNewMonth}>Start New Month</Button>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---- features/Budget/Budget.jsx ---- */
+
+function Budget({ state, toast }) {
+  const [period, setPeriod] = useState("monthly");
+  const [editCat, setEditCat] = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [newCat, setNewCat] = useState({ group: GROUPS.MY_WANTS, name: "", planned: "" });
+
+  const month = getMonth(state.currentMonthId);
+  const b = budgetSummary(state, month.id);
+  const groupOrder = [GROUPS.MUST_PAY, GROUPS.MY_WANTS, GROUPS.SAVINGS, GROUPS.INVESTMENTS];
+
+  function savePlanned() {
+    updateCategory(month.id, editCat.id, { planned: Number(editCat.planned) || 0 });
+    setEditCat(null);
+    toast("Budget updated.");
+  }
+
+  function saveNewCategory() {
+    if (!newCat.name.trim()) return;
+    addCategory(month.id, newCat.group, newCat.name.trim(), Number(newCat.planned) || 0);
+    setAddOpen(false);
+    setNewCat({ group: GROUPS.MY_WANTS, name: "", planned: "" });
+    toast("Category added.");
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+        <Tabs value={period} onChange={setPeriod} items={[{ value: "monthly", label: "Monthly" }, { value: "annual", label: "Annual" }, { value: "custom", label: "Custom" }]} />
+        <Button onClick={() => setAddOpen(true)}>+ Category</Button>
+      </div>
+
+      <Card style={{ marginBottom: 20 }}>
+        <div className="tb-grid tb-grid-3">
+          <div><div className="tb-stat-label">Income</div><div className="tb-stat-value">{fmtKES(b.income)}</div></div>
+          <div><div className="tb-stat-label">Planned</div><div className="tb-stat-value">{fmtKES(b.totalPlanned)}</div></div>
+          <div><div className="tb-stat-label">Spent</div><div className="tb-stat-value">{fmtKES(b.totalSpent)}</div></div>
+        </div>
+      </Card>
+
+      {period !== "monthly" && (
+        <Card><EmptyState icon="🗓️" title={period === "annual" ? "Annual budgeting is coming to this view" : "Custom periods coming soon"} body="For now, plan month by month — see Annual View in the More menu for yearly totals." /></Card>
+      )}
+
+      {period === "monthly" && groupOrder.map(g => {
+        const grp = b.byGroup[g];
+        if (!grp.categories.length) return null;
+        return (
+          <Card key={g} style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+              <h3 className="font-display" style={{ margin: 0, fontSize: 19 }}>{GROUP_LABELS[g]}</h3>
+              <span style={{ color: "var(--ink-soft)", fontSize: 13.5 }}>{fmtKES(grp.spent)} / {fmtKES(grp.planned)}</span>
+            </div>
+            {grp.categories.map(c => (
+              <div key={c.id} style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <button onClick={() => setEditCat({ id: c.id, name: c.name, planned: c.planned })}
+                    style={{ background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14.5, color: "var(--ink)", padding: 0 }}>
+                    {c.name}
+                  </button>
+                  <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>Planned {fmtKES(c.planned)} · Spent {fmtKES(c.spent)} · Remaining {fmtKES(c.remaining)}</span>
+                </div>
+                <ProgressBar pct={c.pct} color={c.pct >= 100 ? "var(--warn)" : g === GROUPS.MY_WANTS ? "var(--rose)" : "var(--sage)"} />
+              </div>
+            ))}
+          </Card>
+        );
+      })}
+
+      <Modal open={!!editCat} onClose={() => setEditCat(null)} title={editCat ? editCat.name : ""} width={380}>
+        {editCat && (
+          <div>
+            <Field label="Planned amount (KSh)"><Input type="number" value={editCat.planned} onChange={e => setEditCat({ ...editCat, planned: e.target.value })} /></Field>
+            <Button full onClick={savePlanned}>Save</Button>
+          </div>
+        )}
+      </Modal>
+
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="New budget category" width={380}>
+        <Field label="Group">
+          <Select value={newCat.group} onChange={e => setNewCat({ ...newCat, group: e.target.value })}>
+            {groupOrder.map(g => <option key={g} value={g}>{GROUP_LABELS[g]}</option>)}
+          </Select>
+        </Field>
+        <Field label="Name"><Input value={newCat.name} onChange={e => setNewCat({ ...newCat, name: e.target.value })} placeholder="e.g. Travel" /></Field>
+        <Field label="Planned amount (KSh)"><Input type="number" value={newCat.planned} onChange={e => setNewCat({ ...newCat, planned: e.target.value })} /></Field>
+        <Button full onClick={saveNewCategory}>Add category</Button>
+      </Modal>
+    </div>
+  );
+}
+
+/* ---- features/Money/Money.jsx ---- */
+
+function Money({ state, toast }) {
+  const [tab, setTab] = useState("transactions");
+  const [accOpen, setAccOpen] = useState(false);
+  const [acc, setAcc] = useState({ name: "", type: "M-Pesa", balance: "", institution: "", currency: state.settings.currency });
+  const [delTx, setDelTx] = useState(null);
+  const [delAcc, setDelAcc] = useState(null);
+
+  const month = getMonth(state.currentMonthId);
+  const txs = monthTxs(state, month.id).slice().sort((a, c) => c.date.localeCompare(a.date));
+
+  function saveAccount() {
+    if (!acc.name.trim()) return;
+    addAccount(acc);
+    setAccOpen(false);
+    setAcc({ name: "", type: "M-Pesa", balance: "", institution: "", currency: state.settings.currency });
+    toast("Account added.");
+  }
+
+  return (
+    <div>
+      <Tabs value={tab} onChange={setTab} items={[{ value: "transactions", label: "Transactions" }, { value: "accounts", label: "Accounts" }]} />
+      <div style={{ height: 16 }} />
+
+      {tab === "transactions" && (
+        <Card>
+          {txs.length === 0 ? (
+            <EmptyState icon="💸" title="No money moves yet" body="Add your first transaction and let's see where your money goes." />
+          ) : txs.map(t => {
+            const cat = month.categories.find(c => c.id === t.categoryId);
+            const account = state.accounts.find(a => a.id === t.accountId);
+            return (
+              <div className="tb-tx-row" key={t.id}>
+                <div className="tb-tx-icon">{t.type === "income" ? "💰" : "🧾"}</div>
+                <div className="tb-tx-main">
+                  <div className="tb-tx-title">{cat ? cat.name : (t.type === "income" ? "Income" : "Uncategorized")}</div>
+                  <div className="tb-tx-sub">{t.date} · {account ? account.name : "No account"}{t.note ? " · " + t.note : ""}</div>
+                </div>
+                <div className={"tb-tx-amount " + t.type}>{t.type === "income" ? "+" : "-"}{fmtKES(t.amount)}</div>
+                <IconButton label="Delete transaction" onClick={() => setDelTx(t.id)}>🗑️</IconButton>
+              </div>
+            );
+          })}
+        </Card>
+      )}
+
+      {tab === "accounts" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+            <Button onClick={() => setAccOpen(true)}>+ Add Account</Button>
+          </div>
+          {state.accounts.length === 0 ? (
+            <Card><EmptyState icon="🏦" title="No accounts yet" body="Add M-Pesa, a bank account, SACCO, or cash to start tracking balances." action={<Button onClick={() => setAccOpen(true)}>+ Add Account</Button>} /></Card>
+          ) : (
+            <div className="tb-grid tb-grid-3">
+              {state.accounts.map(a => (
+                <Card key={a.id}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <div>
+                      <div style={{ fontWeight: 700 }}>{a.name}</div>
+                      <div style={{ fontSize: 12.5, color: "var(--ink-faint)" }}>{a.type}{a.institution ? " · " + a.institution : ""}</div>
+                    </div>
+                    <IconButton label="Delete account" onClick={() => setDelAcc(a.id)}>🗑️</IconButton>
+                  </div>
+                  <div className="tb-stat-value" style={{ marginTop: 10 }}>{fmtMoney(a.balance, a.currency || state.settings.currency)}</div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <Modal open={accOpen} onClose={() => setAccOpen(false)} title="Add account" width={380}>
+        <Field label="Name"><Input value={acc.name} onChange={e => setAcc({ ...acc, name: e.target.value })} placeholder="e.g. My M-Pesa" /></Field>
+        <Field label="Type">
+          <Select value={acc.type} onChange={e => setAcc({ ...acc, type: e.target.value })}>
+            {ACCOUNT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </Select>
+        </Field>
+        <Field label="Current balance"><Input type="number" value={acc.balance} onChange={e => setAcc({ ...acc, balance: e.target.value })} /></Field>
+        <Field label="Currency">
+          <Select value={acc.currency} onChange={e => setAcc({ ...acc, currency: e.target.value })}>
+            {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
+          </Select>
+        </Field>
+        <Field label="Institution (optional)"><Input value={acc.institution} onChange={e => setAcc({ ...acc, institution: e.target.value })} /></Field>
+        <Button full onClick={saveAccount}>Save account</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delTx} onClose={() => setDelTx(null)} title="Delete transaction?" body="This will remove it from your budget and account balance." danger confirmLabel="Delete"
+        onConfirm={() => { deleteTransaction(delTx); toast("Transaction deleted."); }} />
+      <ConfirmDialog open={!!delAcc} onClose={() => setDelAcc(null)} title="Delete account?" body="Transactions linked to this account will remain, but it won't be listed anymore." danger confirmLabel="Delete"
+        onConfirm={() => { deleteAccount(delAcc); toast("Account deleted."); }} />
+    </div>
+  );
+}
+
+/* ---- features/Goals/Goals.jsx ---- */
+
+function statusBadge(status) {
+  if (status === "complete") return <Badge tone="good">Complete</Badge>;
+  if (status === "behind") return <Badge tone="warn">Behind</Badge>;
+  if (status === "no-plan") return <Badge tone="neutral">No plan yet</Badge>;
+  return <Badge tone="info">On track</Badge>;
+}
+
+function EmergencyFundCard({ state, toast }) {
+  const ef = state.goals.emergencyFund;
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [form, setForm] = useState(ef || { targetMonths: 6, essentialMonthlyExpenses: "", savedAmount: "", monthlyContribution: "" });
+  const [contribOpen, setContribOpen] = useState(false);
+  const [contribAmt, setContribAmt] = useState("");
+
+  const progress = ef ? emergencyFundProgress(ef) : null;
+
+  function save() {
+    setEmergencyFund({
+      targetMonths: Number(form.targetMonths) || 6,
+      essentialMonthlyExpenses: Number(form.essentialMonthlyExpenses) || 0,
+      savedAmount: Number(form.savedAmount) || 0,
+      monthlyContribution: Number(form.monthlyContribution) || 0,
+    });
+    setSetupOpen(false);
+    toast("Emergency fund plan saved.");
+  }
+
+  function contribute() {
+    contributeEmergencyFund(Number(contribAmt) || 0);
+    setContribOpen(false);
+    setContribAmt("");
+    toast("Nice — added to your emergency fund 🎉");
+  }
+
+  return (
+    <Card style={{ marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+        <div>
+          <h3 className="font-display" style={{ margin: 0, fontSize: 20 }}>Emergency Fund</h3>
+          <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: "4px 0 0" }}>Your safety net for the unexpected.</p>
+        </div>
+        {progress && statusBadge(progress.status)}
+      </div>
+
+      {!ef ? (
+        <EmptyState icon="🛟" title="Set up your emergency fund" body="Tell Tabbi your essential monthly expenses and how many months you want covered."
+          action={<Button onClick={() => setSetupOpen(true)}>Set up emergency fund</Button>} />
+      ) : (
+        <div>
+          <div className="tb-grid tb-grid-3" style={{ marginBottom: 14 }}>
+            <div><div className="tb-stat-label">Target</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(progress.target)}</div></div>
+            <div><div className="tb-stat-label">Saved</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(progress.saved)}</div></div>
+            <div><div className="tb-stat-label">Remaining</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(progress.remaining)}</div></div>
+          </div>
+          <ProgressBar pct={progress.pct} color={progress.status === "complete" ? "var(--sage)" : "var(--plum)"} height={10} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink-soft)", marginTop: 8 }}>
+            <span>{Math.round(progress.pct)}% funded</span>
+            <span>{progress.monthsToGo != null ? `${progress.monthsToGo} months to go` : "No monthly contribution set"}</span>
+          </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <Button variant="ghost" onClick={() => { setForm(ef); setSetupOpen(true); }}>Edit plan</Button>
+            <Button onClick={() => setContribOpen(true)}>+ Add contribution</Button>
+          </div>
+        </div>
+      )}
+
+      <Modal open={setupOpen} onClose={() => setSetupOpen(false)} title="Emergency fund plan" width={400}>
+        <Field label="Target months of cover">
+          <Select value={form.targetMonths} onChange={e => setForm({ ...form, targetMonths: e.target.value })}>
+            {[3, 6, 9, 12].map(m => <option key={m} value={m}>{m} months</option>)}
+          </Select>
+        </Field>
+        <Field label="Essential monthly expenses (KSh)"><Input type="number" value={form.essentialMonthlyExpenses} onChange={e => setForm({ ...form, essentialMonthlyExpenses: e.target.value })} /></Field>
+        <Field label="Current emergency savings (KSh)"><Input type="number" value={form.savedAmount} onChange={e => setForm({ ...form, savedAmount: e.target.value })} /></Field>
+        <Field label="Monthly contribution (KSh)"><Input type="number" value={form.monthlyContribution} onChange={e => setForm({ ...form, monthlyContribution: e.target.value })} /></Field>
+        <Button full onClick={save}>Save plan</Button>
+      </Modal>
+
+      <Modal open={contribOpen} onClose={() => setContribOpen(false)} title="Add contribution" width={360}>
+        <Field label="Amount (KSh)"><Input type="number" value={contribAmt} onChange={e => setContribAmt(e.target.value)} /></Field>
+        <Button full onClick={contribute}>Add</Button>
+      </Modal>
+    </Card>
+  );
+}
+
+function SinkingFundsSection({ state, toast }) {
+  const funds = state.goals.sinkingFunds;
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", targetAmount: "", dueDate: "", savedAmount: "", frequency: "Monthly" });
+  const [contribFor, setContribFor] = useState(null);
+  const [contribAmt, setContribAmt] = useState("");
+  const [delId, setDelId] = useState(null);
+
+  function save() {
+    if (!form.name.trim()) return;
+    addSinkingFund(form);
+    setAddOpen(false);
+    setForm({ name: "", targetAmount: "", dueDate: "", savedAmount: "", frequency: "Monthly" });
+    toast("Sinking fund created.");
+  }
+
+  function contribute() {
+    contributeSinkingFund(contribFor, Number(contribAmt) || 0);
+    setContribFor(null);
+    setContribAmt("");
+    toast("Contribution added 🎉");
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <h3 className="font-display" style={{ margin: 0, fontSize: 20 }}>Sinking Funds</h3>
+        <Button onClick={() => setAddOpen(true)}>+ Add Goal</Button>
+      </div>
+
+      {funds.length === 0 ? (
+        <Card><EmptyState icon="🎯" title="No sinking funds yet" body="Tell Tabbi what you're saving for and we'll calculate what you need." action={<Button onClick={() => setAddOpen(true)}>+ Add Goal</Button>} /></Card>
+      ) : (
+        <div className="tb-grid tb-grid-2">
+          {funds.map(f => {
+            const p = sinkingFundProgress(f);
+            return (
+              <Card key={f.id}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>{f.name}</div>
+                    <div style={{ fontSize: 12.5, color: "var(--ink-faint)" }}>{f.dueDate ? `Due ${f.dueDate}` : "No due date"} · {f.frequency}</div>
+                  </div>
+                  {statusBadge(p.status)}
+                </div>
+                <div style={{ margin: "12px 0 6px", fontSize: 13.5 }}>{fmtKES(f.savedAmount)} of {fmtKES(f.targetAmount)}</div>
+                <ProgressBar pct={p.pct} color={p.status === "complete" ? "var(--sage)" : "var(--plum)"} />
+                {p.requiredContribution != null && p.status !== "complete" && (
+                  <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 8 }}>
+                    Need {fmtKES(p.requiredContribution)} per {f.frequency === "Weekly" ? "week" : "month"} to stay on track.
+                  </div>
+                )}
+                <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                  <Button size="sm" onClick={() => setContribFor(f.id)}>+ Contribute</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setDelId(f.id)}>Delete</Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="New sinking fund" width={400}>
+        <Field label="Goal name" hint="Pick a template or type your own">
+          <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} list="sinking-templates" placeholder="e.g. Christmas" />
+          <datalist id="sinking-templates">{SINKING_FUND_TEMPLATES.map(t => <option key={t} value={t} />)}</datalist>
+        </Field>
+        <Field label="Target amount (KSh)"><Input type="number" value={form.targetAmount} onChange={e => setForm({ ...form, targetAmount: e.target.value })} /></Field>
+        <Field label="Due date"><Input type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} /></Field>
+        <Field label="Amount already saved (KSh)"><Input type="number" value={form.savedAmount} onChange={e => setForm({ ...form, savedAmount: e.target.value })} /></Field>
+        <Field label="Contribution frequency">
+          <Select value={form.frequency} onChange={e => setForm({ ...form, frequency: e.target.value })}>
+            <option value="Weekly">Weekly</option><option value="Monthly">Monthly</option>
+          </Select>
+        </Field>
+        <Button full onClick={save}>Create sinking fund</Button>
+      </Modal>
+
+      <Modal open={!!contribFor} onClose={() => setContribFor(null)} title="Add contribution" width={360}>
+        <Field label="Amount (KSh)"><Input type="number" value={contribAmt} onChange={e => setContribAmt(e.target.value)} /></Field>
+        <Button full onClick={contribute}>Add</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delId} onClose={() => setDelId(null)} title="Delete sinking fund?" body="This can't be undone." danger confirmLabel="Delete"
+        onConfirm={() => { deleteSinkingFund(delId); toast("Sinking fund deleted."); }} />
+    </div>
+  );
+}
+
+function Goals({ state, toast }) {
+  return (
+    <div>
+      <SaveOneMillionCard state={state} toast={toast} />
+      <EmergencyFundCard state={state} toast={toast} />
+      <SinkingFundsSection state={state} toast={toast} />
+    </div>
+  );
+}
+
+/* ---- features/Insurance/Insurance.jsx ---- */
+
+function insuranceStatusBadge(status) {
+  if (status === "complete") return <Badge tone="good">Fully saved</Badge>;
+  if (status === "behind") return <Badge tone="warn">Behind</Badge>;
+  return <Badge tone="info">On track</Badge>;
+}
+
+function Insurance({ state, toast }) {
+  const policies = state.insurancePolicies;
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ type: INSURANCE_TYPES[0], provider: "", premiumAmount: "", frequency: "Monthly", nextDueDate: "", savedAmount: "" });
+  const [contribFor, setContribFor] = useState(null);
+  const [contribAmt, setContribAmt] = useState("");
+  const [delId, setDelId] = useState(null);
+
+  function save() {
+    addInsurancePolicy(form);
+    setAddOpen(false);
+    setForm({ type: INSURANCE_TYPES[0], provider: "", premiumAmount: "", frequency: "Monthly", nextDueDate: "", savedAmount: "" });
+    toast("Policy added.");
+  }
+
+  function contribute() {
+    const p = policies.find(x => x.id === contribFor);
+    updateInsurancePolicy(contribFor, { savedAmount: (p.savedAmount || 0) + (Number(contribAmt) || 0) });
+    setContribFor(null);
+    setContribAmt("");
+    toast("Added toward your premium.");
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <p style={{ color: "var(--ink-soft)", margin: 0 }}>What am I protecting?</p>
+        <Button onClick={() => setAddOpen(true)}>+ Add Policy</Button>
+      </div>
+
+      {policies.length === 0 ? (
+        <Card><EmptyState icon="🛡️" title="No insurance policies yet" body="Track premiums for life, medical, motor, or any policy — and plan the savings to cover them." action={<Button onClick={() => setAddOpen(true)}>+ Add Policy</Button>} /></Card>
+      ) : (
+        <div className="tb-grid tb-grid-2">
+          {policies.map(p => {
+            const prog = insuranceProgress(p);
+            return (
+              <Card key={p.id}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div>
+                    <div style={{ fontWeight: 700 }}>{p.type}</div>
+                    <div style={{ fontSize: 12.5, color: "var(--ink-faint)" }}>{p.provider || "No provider set"} · {p.frequency}</div>
+                  </div>
+                  {insuranceStatusBadge(prog.status)}
+                </div>
+                <div style={{ margin: "12px 0 6px", fontSize: 13.5 }}>{fmtKES(p.savedAmount)} of {fmtKES(p.premiumAmount)}</div>
+                <ProgressBar pct={prog.pct} color={prog.status === "complete" ? "var(--sage)" : "var(--plum)"} />
+                <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 8 }}>
+                  {p.nextDueDate ? `Due ${p.nextDueDate}` : "No due date set"}
+                  {prog.requiredMonthly != null && prog.status !== "complete" ? ` · Need ${fmtKES(prog.requiredMonthly)}/mo` : ""}
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                  <Button size="sm" onClick={() => setContribFor(p.id)}>+ Contribute</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setDelId(p.id)}>Delete</Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add insurance policy" width={400}>
+        <Field label="Insurance type">
+          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+            {INSURANCE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </Select>
+        </Field>
+        <Field label="Provider (optional)"><Input value={form.provider} onChange={e => setForm({ ...form, provider: e.target.value })} /></Field>
+        <Field label="Premium amount (KSh)"><Input type="number" value={form.premiumAmount} onChange={e => setForm({ ...form, premiumAmount: e.target.value })} /></Field>
+        <Field label="Payment frequency">
+          <Select value={form.frequency} onChange={e => setForm({ ...form, frequency: e.target.value })}>
+            <option>Monthly</option><option>Quarterly</option><option>Annually</option>
+          </Select>
+        </Field>
+        <Field label="Next due date"><Input type="date" value={form.nextDueDate} onChange={e => setForm({ ...form, nextDueDate: e.target.value })} /></Field>
+        <Field label="Amount already saved (KSh)"><Input type="number" value={form.savedAmount} onChange={e => setForm({ ...form, savedAmount: e.target.value })} /></Field>
+        <Button full onClick={save}>Save policy</Button>
+      </Modal>
+
+      <Modal open={!!contribFor} onClose={() => setContribFor(null)} title="Add contribution" width={360}>
+        <Field label="Amount (KSh)"><Input type="number" value={contribAmt} onChange={e => setContribAmt(e.target.value)} /></Field>
+        <Button full onClick={contribute}>Add</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delId} onClose={() => setDelId(null)} title="Delete policy?" body="This can't be undone." danger confirmLabel="Delete"
+        onConfirm={() => { deleteInsurancePolicy(delId); toast("Policy deleted."); }} />
+    </div>
+  );
+}
+
+/* ---- features/Investments/Investments.jsx ---- */
+
+function Investments({ state, toast }) {
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", type: INVESTMENT_TYPES[0], balance: "", institution: "", notes: "" });
+  const [delId, setDelId] = useState(null);
+
+  const total = state.investments.reduce((s, i) => s + i.balance, 0);
+
+  function save() {
+    if (!form.name.trim()) return;
+    addInvestment(form);
+    setAddOpen(false);
+    setForm({ name: "", type: INVESTMENT_TYPES[0], balance: "", institution: "", notes: "" });
+    toast("Investment added.");
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <p style={{ color: "var(--ink-soft)", margin: 0 }}>What am I growing?</p>
+        <Button onClick={() => setAddOpen(true)}>+ Add Investment</Button>
+      </div>
+
+      {state.investments.length === 0 ? (
+        <Card><EmptyState icon="📈" title="No investments tracked yet" body="Add your Money Market Fund, T-Bills, SACCO shares, pension, or any other holding to track balances here." action={<Button onClick={() => setAddOpen(true)}>+ Add Investment</Button>} /></Card>
+      ) : (
+        <div>
+          <Card style={{ marginBottom: 16 }}>
+            <div className="tb-stat-label">Total invested</div>
+            <div className="tb-stat-value">{fmtKES(total)}</div>
+          </Card>
+          <div className="tb-grid tb-grid-3">
+            {state.investments.map(i => (
+              <Card key={i.id}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontWeight: 700 }}>{i.name}</div>
+                    <div style={{ fontSize: 12.5, color: "var(--ink-faint)" }}>{i.type}{i.institution ? " · " + i.institution : ""}</div>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => setDelId(i.id)}>Delete</Button>
+                </div>
+                <div className="tb-stat-value" style={{ marginTop: 10 }}>{fmtKES(i.balance)}</div>
+                {i.notes && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 6 }}>{i.notes}</div>}
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add investment" width={400}>
+        <Field label="Name"><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. CIC Money Market Fund" /></Field>
+        <Field label="Type">
+          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+            {INVESTMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </Select>
+        </Field>
+        <Field label="Current balance (KSh)"><Input type="number" value={form.balance} onChange={e => setForm({ ...form, balance: e.target.value })} /></Field>
+        <Field label="Institution / provider (optional)"><Input value={form.institution} onChange={e => setForm({ ...form, institution: e.target.value })} /></Field>
+        <Field label="Notes (optional)"><Input value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></Field>
+        <Button full onClick={save}>Save investment</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delId} onClose={() => setDelId(null)} title="Delete investment?" body="This can't be undone." danger confirmLabel="Delete"
+        onConfirm={() => { deleteInvestment(delId); toast("Investment deleted."); }} />
+    </div>
+  );
+}
+
+/* ---- features/Debt/Debt.jsx ---- */
+
+function Debt({ state, toast }) {
+  const [tab, setTab] = useState("debts");
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", type: DEBT_TYPES[0], balance: "", interestRate: "", minPayment: "", dueDate: "" });
+  const [payFor, setPayFor] = useState(null);
+  const [payAmt, setPayAmt] = useState("");
+  const [delId, setDelId] = useState(null);
+  const [method, setMethod] = useState("avalanche");
+  const [extra, setExtra] = useState("");
+
+  const totalDebt = state.debts.reduce((s, d) => s + d.balance, 0);
+  const plan = debtPayoffPlan(state.debts, Number(extra) || 0, method);
+
+  function save() {
+    if (!form.name.trim()) return;
+    addDebt(form);
+    setAddOpen(false);
+    setForm({ name: "", type: DEBT_TYPES[0], balance: "", interestRate: "", minPayment: "", dueDate: "" });
+    toast("Debt added.");
+  }
+
+  function pay() {
+    recordDebtPayment(payFor, Number(payAmt) || 0);
+    setPayFor(null);
+    setPayAmt("");
+    toast("Payment recorded 💪");
+  }
+
+  return (
+    <div>
+      <Tabs value={tab} onChange={setTab} items={[{ value: "debts", label: "Your debts" }, { value: "planner", label: "Payoff planner" }]} />
+      <div style={{ height: 16 }} />
+
+      {tab === "debts" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <p style={{ color: "var(--ink-soft)", margin: 0 }}>What am I paying off?</p>
+            <Button onClick={() => setAddOpen(true)}>+ Add Debt</Button>
+          </div>
+          {state.debts.length === 0 ? (
+            <Card><EmptyState icon="🪙" title="No debts tracked yet" body="Add loans, credit cards, or BNPL balances to plan your payoff." action={<Button onClick={() => setAddOpen(true)}>+ Add Debt</Button>} /></Card>
+          ) : (
+            <div>
+              <Card style={{ marginBottom: 16 }}><div className="tb-stat-label">Total owed</div><div className="tb-stat-value">{fmtKES(totalDebt)}</div></Card>
+              <div className="tb-grid tb-grid-2">
+                {state.debts.map(d => (
+                  <Card key={d.id}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <div>
+                        <div style={{ fontWeight: 700 }}>{d.name}</div>
+                        <div style={{ fontSize: 12.5, color: "var(--ink-faint)" }}>{d.type} · {d.interestRate}% APR</div>
+                      </div>
+                      <Button size="sm" variant="ghost" onClick={() => setDelId(d.id)}>Delete</Button>
+                    </div>
+                    <div className="tb-stat-value" style={{ marginTop: 10 }}>{fmtKES(d.balance)}</div>
+                    <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 4 }}>Min payment {fmtKES(d.minPayment)}{d.dueDate ? ` · Due ${d.dueDate}` : ""}</div>
+                    <Button size="sm" onClick={() => setPayFor(d.id)} style={{ marginTop: 10 }}>+ Record payment</Button>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === "planner" && (
+        <div>
+          {state.debts.length === 0 ? (
+            <Card><EmptyState icon="🧮" title="Add a debt first" body="Once you've added at least one debt, Tabbi can build a payoff plan." /></Card>
+          ) : (
+            <Card>
+              <div className="tb-grid tb-grid-2" style={{ marginBottom: 16 }}>
+                <Field label="Method">
+                  <Select value={method} onChange={e => setMethod(e.target.value)}>
+                    <option value="avalanche">Avalanche — highest interest first</option>
+                    <option value="snowball">Snowball — smallest balance first</option>
+                  </Select>
+                </Field>
+                <Field label="Extra monthly payment (KSh)"><Input type="number" value={extra} onChange={e => setExtra(e.target.value)} /></Field>
+              </div>
+              <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>
+                At this pace, you'll be debt-free in about <strong>{plan.months} month{plan.months === 1 ? "" : "s"}</strong>,
+                paying roughly <strong>{fmtKES(plan.totalInterest)}</strong> in interest along the way.
+              </p>
+              <h4 className="font-display" style={{ marginBottom: 10 }}>Payoff order</h4>
+              {plan.milestones.map((m, i) => (
+                <div key={m.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: i < plan.milestones.length - 1 ? "1px solid var(--border)" : "none" }}>
+                  <span>{i + 1}. {m.name}</span>
+                  <span style={{ color: "var(--ink-soft)" }}>Paid off around month {m.month}</span>
+                </div>
+              ))}
+            </Card>
+          )}
+        </div>
+      )}
+
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add debt" width={400}>
+        <Field label="Name"><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. KCB Personal Loan" /></Field>
+        <Field label="Type">
+          <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+            {DEBT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </Select>
+        </Field>
+        <Field label="Current balance (KSh)"><Input type="number" value={form.balance} onChange={e => setForm({ ...form, balance: e.target.value })} /></Field>
+        <Field label="Interest rate (% APR)"><Input type="number" value={form.interestRate} onChange={e => setForm({ ...form, interestRate: e.target.value })} /></Field>
+        <Field label="Minimum payment (KSh)"><Input type="number" value={form.minPayment} onChange={e => setForm({ ...form, minPayment: e.target.value })} /></Field>
+        <Field label="Due date (optional)"><Input type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} /></Field>
+        <Button full onClick={save}>Save debt</Button>
+      </Modal>
+
+      <Modal open={!!payFor} onClose={() => setPayFor(null)} title="Record payment" width={360}>
+        <Field label="Amount (KSh)"><Input type="number" value={payAmt} onChange={e => setPayAmt(e.target.value)} /></Field>
+        <Button full onClick={pay}>Record payment</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delId} onClose={() => setDelId(null)} title="Delete debt?" body="This can't be undone." danger confirmLabel="Delete"
+        onConfirm={() => { deleteDebt(delId); toast("Debt deleted."); }} />
+    </div>
+  );
+}
+
+/* ---- features/NetWorth/NetWorth.jsx ---- */
+
+function NetWorth({ state, toast }) {
+  const nw = netWorth(state);
+  const history = state.netWorthSnapshots;
+
+  function takeSnapshot() {
+    snapshotNetWorth(nw);
+    toast("Net worth snapshot saved.");
+  }
+
+  const hasAssetsOrDebts = state.accounts.length || state.investments.length || state.debts.length;
+
+  return (
+    <div>
+      <p style={{ color: "var(--ink-soft)", marginTop: -6 }}>Your assets minus what you owe.</p>
+
+      {!hasAssetsOrDebts ? (
+        <Card><EmptyState icon="🧮" title="No net worth data yet" body="Add accounts, investments, or debts and Tabbi will calculate your net worth automatically." /></Card>
+      ) : (
+        <div>
+          <Card style={{ marginBottom: 16 }}>
+            <div className="tb-stat-label">Net worth</div>
+            <div className="tb-stat-value" style={{ fontSize: 34 }}>{fmtKES(nw.netWorth)}</div>
+            <div className="tb-grid tb-grid-2" style={{ marginTop: 16 }}>
+              <div><div className="tb-stat-label">Total assets</div><div className="tb-stat-value" style={{ fontSize: 20, color: "var(--sage)" }}>{fmtKES(nw.assets)}</div></div>
+              <div><div className="tb-stat-label">Total liabilities</div><div className="tb-stat-value" style={{ fontSize: 20, color: "var(--warn)" }}>{fmtKES(nw.liabilities)}</div></div>
+            </div>
+            <Button size="sm" variant="ghost" onClick={takeSnapshot} style={{ marginTop: 16 }}>Save today's snapshot</Button>
+          </Card>
+
+          <Card style={{ marginBottom: 16 }}>
+            <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 19 }}>Assets</h3>
+            {state.accounts.map(a => (
+              <Row key={a.id} label={a.name} sub={a.type} value={fmtMoney(a.balance, a.currency || state.settings.currency)} />
+            ))}
+            {state.investments.map(i => (
+              <Row key={i.id} label={i.name} sub={i.type} value={fmtKES(i.balance)} />
+            ))}
+            {state.accounts.length === 0 && state.investments.length === 0 && <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>No assets added yet.</p>}
+          </Card>
+
+          <Card style={{ marginBottom: 16 }}>
+            <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 19 }}>Liabilities</h3>
+            {state.debts.map(d => <Row key={d.id} label={d.name} sub={d.type} value={fmtKES(d.balance)} negative />)}
+            {state.debts.length === 0 && <p style={{ color: "var(--ink-soft)", fontSize: 14 }}>No liabilities added yet.</p>}
+          </Card>
+
+          <Card>
+            <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 19 }}>Net worth over time</h3>
+            {history.length < 2 ? (
+              <EmptyState icon="📈" title="Not enough history yet" body="Save a few snapshots over time and Tabbi will chart your progress here." />
+            ) : (
+              <LineSpark points={history.map(h => h.netWorth)} width={520} height={100} color="var(--plum)" />
+            )}
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+
+  function Row({ label, sub, value, negative }) {
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+        <div><div style={{ fontWeight: 600, fontSize: 14 }}>{label}</div><div style={{ fontSize: 12, color: "var(--ink-faint)" }}>{sub}</div></div>
+        <div style={{ fontWeight: 700, color: negative ? "var(--warn)" : "var(--ink)" }}>{value}</div>
+      </div>
+    );
+  }
+}
+
+/* ---- features/Insights/Insights.jsx ---- */
+
+function toneFor(type) { return type === "warning" ? "warn" : type === "celebration" ? "good" : "info"; }
+function iconFor(type) { return type === "warning" ? "⚠️" : type === "celebration" ? "🎉" : "🔔"; }
+
+function Insights({ state }) {
+  const month = getMonth(state.currentMonthId);
+  const insights = generateInsights(state, month.id);
+
+  return (
+    <div>
+      <p style={{ color: "var(--ink-soft)", marginTop: -6 }}>What is my money telling me? — {monthLabel(month)}</p>
+      {insights.length === 0 ? (
+        <Card><EmptyState icon="💡" title="Nothing to flag right now" body="Once you've got some budget and transaction history, Tabbi will surface useful observations here." /></Card>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {insights.map((ins, i) => (
+            <Card key={i}>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ fontSize: 20 }}>{iconFor(ins.type)}</div>
+                <div style={{ flex: 1 }}>
+                  <Badge tone={toneFor(ins.type)}>{ins.type}</Badge>
+                  <p style={{ margin: "8px 0 0", fontSize: 14.5 }}>{ins.text}</p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---- features/Challenges/Challenges.jsx ---- */
+
+function Challenges({ state, toast }) {
+  const joined = state.challenges.joined;
+  const [createOpen, setCreateOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", icon: "🎯", trackingType: "days", days: "", targetAmount: "", deadline: "" });
+  const [contribFor, setContribFor] = useState(null);
+  const [contribAmt, setContribAmt] = useState("");
+  const [delId, setDelId] = useState(null);
+
+  const otherDefs = CHALLENGE_DEFS.filter(d => d.id !== SAVE_1M_CHALLENGE_ID);
+  const allChallenges = [...otherDefs, ...state.challenges.custom];
+
+  function isJoined(id) { return joined.find(c => c.challengeId === id); }
+
+  function join(def) {
+    joinChallenge(def.id);
+    toast(`Joined "${def.title}" — let's go! 🔥`);
+  }
+
+  function bumpProgress(def) {
+    const jc = isJoined(def.id);
+    const next = Math.min(def.days, (jc.progress || 0) + 1);
+    updateChallengeProgress(def.id, next, def.days);
+    if (next >= def.days) toast(`You just completed "${def.title}" 🎉`);
+    else toast(`${next} day${next === 1 ? "" : "s"} tracked 🔥`);
+  }
+
+  function contribute() {
+    const def = allChallenges.find(d => d.id === contribFor);
+    contributeChallengeProgress(contribFor, Number(contribAmt) || 0, def.targetAmount);
+    setContribFor(null);
+    setContribAmt("");
+    toast("Contribution added 🎉");
+  }
+
+  function saveCustomChallenge() {
+    if (!form.name.trim()) return;
+    let days = null, targetAmount = null;
+    if (form.trackingType === "days") {
+      days = form.deadline ? Math.max(1, Math.ceil((new Date(form.deadline) - new Date()) / 86400000)) : (Number(form.days) || 7);
+    } else {
+      targetAmount = Number(form.targetAmount) || 0;
+    }
+    addCustomChallenge({ title: form.name.trim(), icon: form.icon || "🎯", trackingType: form.trackingType, days, targetAmount, deadline: form.deadline || null });
+    setCreateOpen(false);
+    setForm({ name: "", icon: "🎯", trackingType: "days", days: "", targetAmount: "", deadline: "" });
+    toast("Challenge created — join it whenever you're ready.");
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+        <p style={{ color: "var(--ink-soft)", margin: 0 }}>Small money habits, made fun.</p>
+        <Button onClick={() => setCreateOpen(true)}>+ Create Challenge</Button>
+      </div>
+
+      <SaveOneMillionCard state={state} toast={toast} />
+
+      <div className="tb-grid tb-grid-3">
+        {allChallenges.map(def => {
+          const jc = isJoined(def.id);
+          const isAmount = def.trackingType === "amount";
+          const prog = challengeProgress(def, jc);
+          const completed = jc && jc.completedAt;
+          return (
+            <Card key={def.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div style={{ fontSize: 26, marginBottom: 6 }}>{def.icon}</div>
+                {def.custom && <Button size="sm" variant="ghost" onClick={() => setDelId(def.id)}>Delete</Button>}
+              </div>
+              <h3 className="font-display" style={{ margin: "0 0 4px", fontSize: 17 }}>{def.title}</h3>
+              <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 12px" }}>{def.description}</p>
+              {jc ? (
+                <div>
+                  <ProgressBar pct={prog.pct} color={completed ? "var(--sage)" : "var(--plum)"} />
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "var(--ink-soft)", margin: "8px 0 12px" }}>
+                    <span>{isAmount ? `${fmtKES(prog.saved)} / ${fmtKES(prog.target)}` : `${prog.progress} / ${prog.target} days`}</span>
+                    {completed ? <Badge tone="good">Completed 🎉</Badge> : <Badge tone="neutral">In progress</Badge>}
+                  </div>
+                  {isAmount && !completed && (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                      {challengeMilestones(def.targetAmount).map(m => (
+                        <span key={m.pct} className={"tb-chip" + (prog.saved >= m.amount ? " active" : "")}>{m.pct}%</span>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {!completed && isAmount && <Button size="sm" onClick={() => setContribFor(def.id)}>+ Contribute</Button>}
+                    {!completed && !isAmount && <Button size="sm" onClick={() => bumpProgress(def)}>Log today</Button>}
+                    <Button size="sm" variant="ghost" onClick={() => { leaveChallenge(def.id); toast("Left the challenge."); }}>Leave</Button>
+                  </div>
+                </div>
+              ) : (
+                <Button size="sm" onClick={() => join(def)}>Join challenge</Button>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create your own challenge" width={420}>
+        <Field label="Name"><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. No Boda Boda Month" /></Field>
+        <Field label="Icon (emoji, optional)"><Input value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} maxLength={2} /></Field>
+        <Field label="Tracking type">
+          <Select value={form.trackingType} onChange={e => setForm({ ...form, trackingType: e.target.value })}>
+            <option value="days">Day streak — log progress daily</option>
+            <option value="amount">Save an amount — track contributions</option>
+          </Select>
+        </Field>
+        {form.trackingType === "days" ? (
+          <div>
+            <Field label="Duration (days)" hint="Or set a deadline below instead"><Input type="number" value={form.days} onChange={e => setForm({ ...form, days: e.target.value })} placeholder="7" /></Field>
+            <Field label="Deadline (optional)"><Input type="date" value={form.deadline} onChange={e => setForm({ ...form, deadline: e.target.value })} /></Field>
+          </div>
+        ) : (
+          <Field label={`Target amount (${state.settings.currency})`}><Input type="number" value={form.targetAmount} onChange={e => setForm({ ...form, targetAmount: e.target.value })} /></Field>
+        )}
+        <Button full onClick={saveCustomChallenge}>Create challenge</Button>
+      </Modal>
+
+      <Modal open={!!contribFor} onClose={() => setContribFor(null)} title="Add contribution" width={360}>
+        <Field label={`Amount (${state.settings.currency})`}><Input type="number" value={contribAmt} onChange={e => setContribAmt(e.target.value)} /></Field>
+        <Button full onClick={contribute}>Add</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delId} onClose={() => setDelId(null)} title="Delete this challenge?" body="This can't be undone." danger confirmLabel="Delete"
+        onConfirm={() => { deleteCustomChallenge(delId); toast("Challenge deleted."); }} />
+    </div>
+  );
+}
+
+/* ---- features/RoastMe/RoastMe.jsx ---- */
+
+const LEVELS = [{ value: "GENTLE", label: "Gentle" }, { value: "PLAYFUL", label: "Playful" }, { value: "BRUTAL", label: "Brutal" }];
+
+function RoastMe({ state }) {
+  const [level, setLevel] = useState((state.settings.roastLevel || "PLAYFUL").toUpperCase());
+  const month = getMonth(state.currentMonthId);
+  const roasts = generateRoasts(state, month.id, level);
+
+  function setLevelAndSave(l) {
+    setLevel(l);
+    updateSettings({ roastLevel: l });
+  }
+
+  return (
+    <div>
+      <p style={{ color: "var(--ink-soft)", marginTop: -6 }}>Call me out 😂 — based on your actual spending this month.</p>
+      <Tabs value={level} onChange={setLevelAndSave} items={LEVELS} />
+      <div style={{ height: 16 }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {roasts.map((r, i) => (
+          <Card key={i} style={{ background: level === "BRUTAL" ? "var(--blush)" : undefined }}>
+            <p className="font-hand" style={{ fontSize: 22, margin: 0 }}>{r}</p>
+          </Card>
+        ))}
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--ink-faint)", marginTop: 16 }}>
+        Tabbi roasts spending behaviour, never your circumstances. If something here doesn't feel fair, tell us.
+      </p>
+    </div>
+  );
+}
+
+/* ---- features/MoneyNotes/MoneyNotes.jsx ---- */
+
+function MoneyNotes({ state, toast }) {
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ category: NOTE_CATEGORIES[0], text: "" });
+  const [delId, setDelId] = useState(null);
+
+  const notes = state.moneyNotes.slice().sort((a, b) => b.date.localeCompare(a.date));
+
+  function save() {
+    if (!form.text.trim()) return;
+    addNote(form);
+    setAddOpen(false);
+    setForm({ category: NOTE_CATEGORIES[0], text: "" });
+    toast("Note saved.");
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <p style={{ color: "var(--ink-soft)", margin: 0 }}>What am I learning?</p>
+        <Button onClick={() => setAddOpen(true)}>+ New Note</Button>
+      </div>
+
+      {notes.length === 0 ? (
+        <Card><EmptyState icon="📝" title="No money notes yet" body="Jot down money thoughts, reflections, or lessons as they come to you." action={<Button onClick={() => setAddOpen(true)}>+ New Note</Button>} /></Card>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {notes.map(n => (
+            <Card key={n.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <Badge tone="info">{n.category}</Badge>
+                <Button size="sm" variant="ghost" onClick={() => setDelId(n.id)}>Delete</Button>
+              </div>
+              <p style={{ margin: "10px 0 6px", fontSize: 15 }}>{n.text}</p>
+              <div style={{ fontSize: 12, color: "var(--ink-faint)" }}>{new Date(n.date).toLocaleDateString()}</div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="New money note" width={420}>
+        <Field label="Category">
+          <Select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+            {NOTE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </Select>
+        </Field>
+        <Field label="Note"><Textarea rows={5} value={form.text} onChange={e => setForm({ ...form, text: e.target.value })} placeholder="What's on your mind about money today?" /></Field>
+        <Button full onClick={save}>Save note</Button>
+      </Modal>
+
+      <ConfirmDialog open={!!delId} onClose={() => setDelId(null)} title="Delete note?" body="This can't be undone." danger confirmLabel="Delete"
+        onConfirm={() => { deleteNote(delId); toast("Note deleted."); }} />
+    </div>
+  );
+}
+
+/* ---- features/Settings/Settings.jsx ---- */
+
+const PERSONALITIES = ["Supportive", "Playful", "Direct", "Roast Me"];
+const NOTIF_LABELS = {
+  upcomingBill: "Upcoming bill", goalMilestone: "Goal milestone", challengeProgress: "Challenge progress",
+  budgetWarning: "Budget warning", newMonth: "New month", recurringPayment: "Recurring payment", sinkingFundDeadline: "Sinking fund deadline",
+};
+
+function Section({ title, children, hint }) {
+  return (
+    <Card style={{ marginBottom: 16 }}>
+      <h3 className="font-display" style={{ margin: "0 0 4px", fontSize: 18 }}>{title}</h3>
+      {hint && <p style={{ color: "var(--ink-soft)", fontSize: 13, margin: "0 0 14px" }}>{hint}</p>}
+      {children}
+    </Card>
+  );
+}
+
+function Settings({ state, toast, onToggleTheme }) {
+  const s = state.settings;
+  const [resetOpen, setResetOpen] = useState(false);
+  const [nameDraft, setNameDraft] = useState(s.displayName || "");
+
+  function saveName() {
+    updateSettings({ displayName: nameDraft.trim() });
+    toast("Name updated.");
+  }
+
+  return (
+    <div>
+      <Section title="Profile" hint="What Tabbi calls you around the app.">
+        <Field label="Preferred name / nickname">
+          <div style={{ display: "flex", gap: 8 }}>
+            <Input value={nameDraft} onChange={e => setNameDraft(e.target.value)} placeholder="e.g. Waceke" />
+            <Button onClick={saveName} disabled={nameDraft.trim() === (s.displayName || "")}>Save</Button>
+          </div>
+        </Field>
+      </Section>
+
+      <Section title="Personality" hint="How Tabbi talks to you.">
+        <Field label="Tabbi's tone">
+          <Select value={s.personality} onChange={e => { updateSettings({ personality: e.target.value }); toast("Personality updated."); }}>
+            {PERSONALITIES.map(p => <option key={p} value={p}>{p}</option>)}
+          </Select>
+        </Field>
+      </Section>
+
+      <Section title="Theme">
+        <Button variant="secondary" onClick={onToggleTheme}>Switch to {s.theme === "dark" ? "light" : "dark"} mode</Button>
+      </Section>
+
+      <Section title="Currency">
+        <Field label="Primary currency" hint="Used across your budget, goals, and totals.">
+          <Select value={s.currency} onChange={e => { updateSettings({ currency: e.target.value }); toast("Currency updated."); }}>
+            {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
+          </Select>
+        </Field>
+      </Section>
+
+      <Section title="Notifications" hint="Choose what Tabbi should nudge you about.">
+        {Object.entries(NOTIF_LABELS).map(([key, label]) => (
+          <label key={key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0" }}>
+            <span>{label}</span>
+            <input type="checkbox" checked={!!s.notifications[key]} onChange={e => updateNotificationSettings({ [key]: e.target.checked })} />
+          </label>
+        ))}
+      </Section>
+
+      <Section title="Privacy" hint="Tabbi keeps your data on this device. We don't claim bank-level security — just sensible, honest protections.">
+        <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0" }}>
+          <span>PIN protection</span>
+          <input type="checkbox" checked={s.pinEnabled} onChange={e => updateSettings({ pinEnabled: e.target.checked })} />
+        </label>
+        {s.pinEnabled && (
+          <Field label="4-digit PIN">
+            <Input type="password" maxLength={4} value={s.pin || ""} onChange={e => updateSettings({ pin: e.target.value })} />
+          </Field>
+        )}
+      </Section>
+
+      <Section title="Data management">
+        <p style={{ color: "var(--ink-soft)", fontSize: 13.5 }}>This clears every account, transaction, goal, and note on this device. It cannot be undone.</p>
+        <Button variant="danger" onClick={() => setResetOpen(true)}>Reset all data</Button>
+      </Section>
+
+      <ConfirmDialog open={resetOpen} onClose={() => setResetOpen(false)} title="Reset all data?" danger confirmLabel="Reset everything"
+        body="This permanently deletes all Tabbi data stored on this device."
+        onConfirm={() => { resetAllData(); toast("All data has been reset."); }} />
+    </div>
+  );
+}
+
+/* ---- features/History/History.jsx ---- */
+
+const MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function MoneyHistory({ state }) {
+  const [openId, setOpenId] = useState(null);
+  const months = Object.values(state.months).sort((a, b) => (b.year - a.year) || (b.month - a.month));
+  const byYear = {};
+  months.forEach(m => { (byYear[m.year] = byYear[m.year] || []).push(m); });
+
+  if (months.length === 0) return <Card><EmptyState icon="🗓️" title="No history yet" body="Once you close a month, it'll show up here." /></Card>;
+
+  return (
+    <div>
+      {Object.keys(byYear).sort((a, b) => b - a).map(year => (
+        <Card key={year} style={{ marginBottom: 16 }}>
+          <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 19 }}>{year}</h3>
+          <div className="tb-grid tb-grid-3">
+            {byYear[year].map(m => {
+              const b = budgetSummary(state, m.id);
+              const open = openId === m.id;
+              return (
+                <div key={m.id}>
+                  <button onClick={() => setOpenId(open ? null : m.id)} className="tb-chip" style={{ width: "100%", justifyContent: "space-between" }}>
+                    <span>{monthLabel(m)}</span><span>{m.status === "CLOSED" ? "🔒" : "●"}</span>
+                  </button>
+                  {open && (
+                    <div style={{ padding: 12, fontSize: 13.5, color: "var(--ink-soft)" }}>
+                      <div>Income: {fmtKES(incomeTotal(state, m.id))}</div>
+                      <div>Spent: {fmtKES(expenseTotal(state, m.id))}</div>
+                      <div>Planned: {fmtKES(b.totalPlanned)}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function AnnualView({ state }) {
+  const years = [...new Set(Object.values(state.months).map(m => m.year))].sort((a, b) => b - a);
+  const [year, setYear] = useState(years[0] || new Date().getFullYear());
+  const [view, setView] = useState("year");
+  const summary = annualSummary(state, year);
+  const insights = annualInsights(state, year);
+  const catBreakdown = categoryBreakdownForYear(state, year);
+  const hasData = summary.totals.income > 0 || summary.totals.expense > 0;
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+        <Select value={year} onChange={e => setYear(Number(e.target.value))} style={{ width: 140 }}>
+          {years.length ? years.map(y => <option key={y} value={y}>{y}</option>) : <option value={year}>{year}</option>}
+        </Select>
+        <Tabs value={view} onChange={setView} items={[{ value: "year", label: "Year" }, { value: "category", label: "Category" }, { value: "month", label: "Month" }]} />
+      </div>
+
+      {!hasData ? (
+        <Card><EmptyState icon="📊" title={`No data for ${year} yet`} body="Once you log income and expenses this year, your annual picture builds automatically." /></Card>
+      ) : (
+        <div>
+          <Card style={{ marginBottom: 16 }}>
+            <h3 className="font-display" style={{ margin: "0 0 12px", fontSize: 20 }}>{year} Money Year</h3>
+            <div className="tb-grid tb-grid-4">
+              <div><div className="tb-stat-label">Total income</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(summary.totals.income)}</div></div>
+              <div><div className="tb-stat-label">Total spending</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(summary.totals.expense)}</div></div>
+              <div><div className="tb-stat-label">Total saved</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(summary.totals.savings)}</div></div>
+              <div><div className="tb-stat-label">Total invested</div><div className="tb-stat-value" style={{ fontSize: 20 }}>{fmtKES(summary.totals.invested)}</div></div>
+            </div>
+          </Card>
+
+          {view === "year" && (
+            <Card style={{ marginBottom: 16 }}>
+              <h4 className="font-display" style={{ marginTop: 0 }}>Monthly trends</h4>
+              <BarChart data={summary.perMonth.map(m => ({ label: MONTH_ABBR[m.month - 1], value: m.income }))} color="var(--sage)" />
+              <p style={{ fontSize: 12.5, color: "var(--ink-faint)", marginTop: 8 }}>Income by month</p>
+            </Card>
+          )}
+
+          {view === "category" && (
+            <Card style={{ marginBottom: 16 }}>
+              <h4 className="font-display" style={{ marginTop: 0 }}>Annual category breakdown</h4>
+              {catBreakdown.map(c => (
+                <div key={c.name} style={{ marginBottom: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, marginBottom: 4 }}><span>{c.name}</span><span>{fmtKES(c.value)}</span></div>
+                  <ProgressBar pct={catBreakdown[0].value > 0 ? (c.value / catBreakdown[0].value) * 100 : 0} />
+                </div>
+              ))}
+            </Card>
+          )}
+
+          {view === "month" && (
+            <Card style={{ marginBottom: 16 }}>
+              <h4 className="font-display" style={{ marginTop: 0 }}>Month by month</h4>
+              {summary.perMonth.map(m => (
+                <div key={m.month} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+                  <span>{MONTH_ABBR[m.month - 1]}</span>
+                  <span style={{ color: "var(--ink-soft)" }}>Income {fmtKES(m.income)} · Spent {fmtKES(m.expense)}</span>
+                </div>
+              ))}
+            </Card>
+          )}
+
+          {insights.length > 0 && (
+            <Card>
+              <h4 className="font-display" style={{ marginTop: 0 }}>Annual insights</h4>
+              {insights.map((t, i) => <p key={i} style={{ fontSize: 14 }}>{t}</p>)}
+            </Card>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function History({ state, initialTab }) {
+  const [tab, setTab] = useState(initialTab || "history");
+  return (
+    <div>
+      <Tabs value={tab} onChange={setTab} items={[{ value: "history", label: "Money History" }, { value: "annual", label: "Annual View" }]} />
+      <div style={{ height: 16 }} />
+      {tab === "history" ? <MoneyHistory state={state} /> : <AnnualView state={state} />}
+    </div>
+  );
+}
+
+/* ---- App.jsx ---- */
+
+const TITLES = {
+  home: "Home", budget: "Budget", goals: "Goals", money: "Money", investments: "Investments",
+  debt: "Debt", insurance: "Insurance", networth: "Net Worth", insights: "Insights",
+  challenges: "Challenges", roastme: "Roast Me", notes: "Money Notes", more: "More",
+  settings: "Settings", history: "Money History", annual: "Annual View", help: "How Tabbi Works",
+};
+
+function App() {
+  const state = useTabbiState();
+  const [route, setRoute] = useState("home");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [addMoneyOpen, setAddMoneyOpen] = useState(false);
+  const [startMonthOpen, setStartMonthOpen] = useState(false);
+  const [toast, toastNode] = useToasts();
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", state.settings.theme);
+  }, [state.settings.theme]);
+
+  function toggleTheme() {
+    updateSettings({ theme: state.settings.theme === "dark" ? "light" : "dark" });
+  }
+
+  if (!state.onboarded) {
+    return <Onboarding onDone={() => {}} />;
+  }
+
+  const commonProps = { state, toast, setRoute };
+
+  let screen;
+  switch (route) {
+    case "home": screen = <Home {...commonProps} onAddMoney={() => setAddMoneyOpen(true)} onStartNewMonth={() => setStartMonthOpen(true)} />; break;
+    case "budget": screen = <Budget {...commonProps} />; break;
+    case "money": screen = <Money {...commonProps} />; break;
+    case "goals": screen = <Goals {...commonProps} />; break;
+    case "insurance": screen = <Insurance {...commonProps} />; break;
+    case "investments": screen = <Investments {...commonProps} />; break;
+    case "debt": screen = <Debt {...commonProps} />; break;
+    case "networth": screen = <NetWorth {...commonProps} />; break;
+    case "insights": screen = <Insights {...commonProps} />; break;
+    case "challenges": screen = <Challenges {...commonProps} />; break;
+    case "roastme": screen = <RoastMe {...commonProps} />; break;
+    case "notes": screen = <MoneyNotes {...commonProps} />; break;
+    case "more": screen = <More setRoute={setRoute} />; break;
+    case "settings": screen = <Settings {...commonProps} onToggleTheme={toggleTheme} />; break;
+    case "history": screen = <History state={state} initialTab="history" />; break;
+    case "annual": screen = <History state={state} initialTab="annual" />; break;
+    case "help": screen = <Help />; break;
+    default: screen = <Home {...commonProps} onAddMoney={() => setAddMoneyOpen(true)} onStartNewMonth={() => setStartMonthOpen(true)} />;
+  }
+
+  return (
+    <div className="tb-app">
+      <Sidebar route={route} setRoute={setRoute} state={state} setCurrentMonthId={setCurrentMonth} />
+      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} route={route} setRoute={setRoute} />
+      <main className="tb-main">
+        <TopBar title={TITLES[route] || "Tabbi"} onMenu={() => setDrawerOpen(true)}
+          onAddMoney={() => setAddMoneyOpen(true)} onToggleTheme={toggleTheme} theme={state.settings.theme} />
+        <div className="tb-page">{screen}</div>
+      </main>
+      <MobileNav route={route} setRoute={setRoute} />
+
+      <AddMoneyModal open={addMoneyOpen} onClose={() => setAddMoneyOpen(false)} state={state} toast={toast} />
+      <StartNewMonthModal open={startMonthOpen} onClose={() => setStartMonthOpen(false)} state={state} toast={toast} onDone={() => setRoute("home")} />
+      {toastNode}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(React.StrictMode, null, React.createElement(App)));
+
+</script>
+</body>
+</html>
