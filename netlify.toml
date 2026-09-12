@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Tabbi is a single-page app with in-app (state-based) navigation today.
+# This redirect is here so that if URL-based routing (react-router or similar)
+# is added later, deep links still resolve correctly instead of 404ing.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
